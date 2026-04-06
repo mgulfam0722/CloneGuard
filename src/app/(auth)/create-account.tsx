@@ -1,0 +1,427 @@
+import { Button, Checkbox, Header, Input, PhoneInput } from '@/components';
+import colors from '@/constants/colors';
+import { useAxiosRequest } from '@/hooks/useAxiosRequest';
+import { useSessionStore } from '@/stores';
+import { layout } from '@/styles/common';
+import { fonts, typography } from '@/styles/typography';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { Platform, StyleSheet, Text, View } from 'react-native';
+import { showMessage } from 'react-native-flash-message';
+import { KeyboardAwareScrollView, KeyboardProvider } from 'react-native-keyboard-controller';
+import { z } from 'zod';
+
+// Zod validation schema
+const createAccountSchema = z
+    .object({
+        fullName: z
+            .string()
+            .min(1, 'Full name is required')
+            .min(2, 'Full name must be at least 2 characters')
+            .max(50, 'Full name must be less than 50 characters')
+            .regex(/^[a-zA-Z\s]+$/, 'Full name can only contain letters and spaces'),
+
+        phoneNumber: z
+            .string()
+            .min(1, 'Phone number is required')
+            .regex(
+                /^(\+971|0)?[5][0,2,4,5,6,8][0-9]{7}$/,
+                'Please enter a valid UAE phone number (05xxxxxxxx or +9715xxxxxxxx)',
+            ),
+
+        email: z
+            .string()
+            .min(1, 'Email is required')
+            .email('Please enter a valid email address')
+            .max(100, 'Email must be less than 100 characters'),
+
+        password: z
+            .string()
+            .min(1, 'Password is required')
+            .min(8, 'Password must be at least 8 characters')
+            .max(50, 'Password must be less than 50 characters')
+            .regex(
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+                'Password must contain at least one uppercase letter, one lowercase letter, and one number',
+            ),
+
+        confirmPassword: z.string().min(1, 'Please confirm your password'),
+
+        address: z
+            .string()
+            .min(1, 'Address is required')
+            .min(10, 'Address must be at least 10 characters')
+            .max(200, 'Address must be less than 200 characters'),
+
+        city: z
+            .string()
+            .min(1, 'City is required')
+            .min(2, 'City must be at least 2 characters')
+            .max(50, 'City must be less than 50 characters')
+            .regex(/^[a-zA-Z\s]+$/, 'City can only contain letters and spaces'),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+        message: "Passwords don't match",
+        path: ['confirmPassword'],
+    });
+
+type CreateAccountFormData = z.infer<typeof createAccountSchema>;
+
+type SignupResponse = {
+    token?: string;
+    user?: any;
+    // Add other response fields as needed
+};
+
+export default function CreateAccount() {
+    const [isChecked, setIsChecked] = useState(false);
+    const router = useRouter();
+    const { signIn } = useSessionStore();
+
+    const { sendRequest, loading } = useAxiosRequest<
+        SignupResponse,
+        {
+            FullName: string;
+            Email: string;
+            PhoneNumber: string;
+            Password: string;
+            Address: string;
+            City: string;
+        }
+    >();
+
+    const {
+        control,
+        handleSubmit,
+        formState: { errors, isValid },
+        watch,
+    } = useForm<CreateAccountFormData>({
+        resolver: zodResolver(createAccountSchema),
+        mode: 'onChange',
+        defaultValues: {
+            fullName: '',
+            phoneNumber: '',
+            email: '',
+            password: '',
+            confirmPassword: '',
+            address: '',
+            city: '',
+        },
+    });
+
+    const onSubmit = async (data: CreateAccountFormData) => {
+        if (!isChecked) {
+            showMessage({
+                type: 'danger',
+                message: 'Please accept our terms and conditions.',
+            });
+            return;
+        }
+
+        try {
+            const response = await sendRequest({
+                method: 'POST',
+                url: '/api/v1/client/Auth/signup',
+                data: {
+                    FullName: data.fullName,
+                    Email: data.email,
+                    PhoneNumber: data.phoneNumber,
+                    Password: data.password,
+                    Address: data.address,
+                    City: data.city,
+                },
+            });
+            console.log('create account response: ', response);
+            if (response.status) {
+                // Navigate to OTP screen for verification
+                // Don't call signIn here - wait for OTP verification
+                router.navigate({
+                    pathname: '/otp',
+                    params: { email: data.email },
+                });
+            }
+        } catch (error) {
+            console.error('Signup failed:', error);
+            // Error handling is already done in the useAxiosRequest hook
+        }
+    };
+    return (
+        <KeyboardProvider>
+            <View
+                style={[
+                    layout.fill,
+                    {
+                        backgroundColor: colors.light.primaryDark,
+                    },
+                ]}
+            >
+                <Header />
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        marginTop: 20,
+                        alignItems: 'center',
+                    }}
+                >
+                    <View>
+                        <Text
+                            style={{
+                                fontFamily: fonts.TeachersSemiBold,
+                                color: colors.light.white,
+                                fontSize: 48,
+                                lineHeight: 45,
+                                letterSpacing: -3,
+                            }}
+                        >
+                            Create {'\n'}Account
+                        </Text>
+                    </View>
+                    <View>
+                        <View
+                            style={{
+                                borderWidth: 5,
+                                borderColor: colors.light.secondaryColor,
+                                width: 76,
+                                height: 76,
+                                borderRadius: 38,
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}
+                        >
+                            <Ionicons name="person" size={40} color={colors.light.secondaryColor} />
+                        </View>
+                    </View>
+                </View>
+                <KeyboardAwareScrollView
+                    contentContainerStyle={styles.scrollContent}
+                    bottomOffset={Platform.select({ ios: 50, android: 100 })}
+                    showsVerticalScrollIndicator={false}
+                >
+                    <View>
+                        <Controller
+                            control={control}
+                            name="fullName"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <Input
+                                    title="Full Name"
+                                    placeholderText="Enter your full name"
+                                    props={{
+                                        autoCapitalize: 'words',
+                                        value,
+                                        onChangeText: onChange,
+                                        onBlur: onBlur,
+                                    }}
+                                />
+                            )}
+                        />
+                        {errors.fullName && (
+                            <Text style={styles.errorText}>{errors.fullName.message}</Text>
+                        )}
+
+                        {/* <Input
+                            title="Phone Number"
+                            placeholderText="Enter your phone number"
+                            props={{
+                                keyboardType: 'phone-pad',
+                            }}
+                        /> */}
+                        <Text style={[styles.titleText]}>Phone Number</Text>
+                        <Controller
+                            control={control}
+                            name="phoneNumber"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <PhoneInput value={value} onChangeText={onChange} />
+                            )}
+                        />
+                        {errors.phoneNumber && (
+                            <Text style={styles.errorText}>{errors.phoneNumber.message}</Text>
+                        )}
+
+                        <Controller
+                            control={control}
+                            name="email"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <Input
+                                    title="Email"
+                                    placeholderText="Enter your email"
+                                    props={{
+                                        keyboardType: 'email-address',
+                                        autoCapitalize: 'none',
+                                        value,
+                                        onChangeText: onChange,
+                                        onBlur: onBlur,
+                                    }}
+                                />
+                            )}
+                        />
+                        {errors.email && (
+                            <Text style={styles.errorText}>{errors.email.message}</Text>
+                        )}
+
+                        <Controller
+                            control={control}
+                            name="password"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <Input
+                                    title="Password"
+                                    placeholderText="Create a password"
+                                    isPasswordHidden={true}
+                                    props={{
+                                        autoCapitalize: 'none',
+                                        value,
+                                        onChangeText: onChange,
+                                        onBlur: onBlur,
+                                    }}
+                                    icon={
+                                        <Ionicons
+                                            name="eye-off"
+                                            size={20}
+                                            color={colors.light.gray600}
+                                        />
+                                    }
+                                />
+                            )}
+                        />
+                        {errors.password && (
+                            <Text style={styles.errorText}>{errors.password.message}</Text>
+                        )}
+
+                        <Controller
+                            control={control}
+                            name="confirmPassword"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <Input
+                                    title="Confirm Password"
+                                    placeholderText="Re-enter your password"
+                                    isPasswordHidden={true}
+                                    props={{
+                                        autoCapitalize: 'none',
+                                        value,
+                                        onChangeText: onChange,
+                                        onBlur: onBlur,
+                                    }}
+                                    icon={
+                                        <Ionicons
+                                            name="eye-off"
+                                            size={20}
+                                            color={colors.light.gray600}
+                                        />
+                                    }
+                                />
+                            )}
+                        />
+                        {errors.confirmPassword && (
+                            <Text style={styles.errorText}>{errors.confirmPassword.message}</Text>
+                        )}
+
+                        <Controller
+                            control={control}
+                            name="address"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <Input
+                                    title="Address"
+                                    placeholderText="Enter your address"
+                                    props={{
+                                        autoCapitalize: 'sentences',
+                                        value,
+                                        onChangeText: onChange,
+                                        onBlur: onBlur,
+                                    }}
+                                />
+                            )}
+                        />
+                        {errors.address && (
+                            <Text style={styles.errorText}>{errors.address.message}</Text>
+                        )}
+
+                        <Controller
+                            control={control}
+                            name="city"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <Input
+                                    title="City"
+                                    placeholderText="Enter your city"
+                                    props={{
+                                        autoCapitalize: 'words',
+                                        value,
+                                        onChangeText: onChange,
+                                        onBlur: onBlur,
+                                    }}
+                                />
+                            )}
+                        />
+                        {errors.city && <Text style={styles.errorText}>{errors.city.message}</Text>}
+
+                        <View style={styles.checkboxContainer}>
+                            <Checkbox
+                                value={isChecked}
+                                onValueChange={(value) => setIsChecked(value as boolean)}
+                            />
+                            <Text
+                                style={[
+                                    typography.body,
+                                    {
+                                        paddingHorizontal: 20,
+                                        color: '#9E9E9E',
+                                        fontFamily: fonts.TeachersRegular,
+                                        fontSize: 12,
+                                    },
+                                ]}
+                            >
+                                I accept the terms and legally binding agreements and privacy policy
+                            </Text>
+                        </View>
+
+                        <Button
+                            title={loading ? 'Creating Account...' : 'Create Account'}
+                            style={{
+                                paddingHorizontal: 15,
+                                marginTop: 30,
+                            }}
+                            onPressCallback={handleSubmit(onSubmit)}
+                            // props={{
+                            //     disabled: !isValid || !isChecked || loading
+                            // }}
+                        />
+                    </View>
+                </KeyboardAwareScrollView>
+            </View>
+        </KeyboardProvider>
+    );
+}
+
+const styles = StyleSheet.create({
+    title: {
+        fontSize: 22,
+        fontWeight: '700',
+    },
+    scrollContent: {
+        flexGrow: 1,
+        paddingBottom: 20,
+    },
+    checkboxContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-evenly',
+        marginTop: 20,
+    },
+    titleText: {
+        ...typography.body,
+        color: colors.light.white,
+        paddingLeft: 16,
+        marginVertical: 10,
+        fontWeight: '400',
+    },
+    errorText: {
+        color: '#FF6B6B',
+        fontSize: 12,
+        fontFamily: fonts.TeachersRegular,
+        marginTop: 5,
+        marginLeft: 16,
+        marginBottom: 10,
+    },
+});

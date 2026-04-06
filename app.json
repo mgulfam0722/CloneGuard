@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.m-gulfam.CloneGuard"
     },
     "android": {
       "adaptiveIcon": {
@@ -19,7 +20,12 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.m_gulfam.CloneGuard",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "output": "static",
@@ -28,15 +34,41 @@
     "plugins": [
       "expo-router",
       [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "barcodeScannerEnabled": true
+        }
+      ],
+      [
         "expo-splash-screen",
         {
+          "backgroundColor": "#053348",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
           "dark": {
-            "backgroundColor": "#000000"
-          }
+            "image": "./assets/images/splash-icon.png",
+            "backgroundColor": "#053348"
+          },
+          "imageWidth": 200
+        }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/Sora-Bold.ttf",
+            "./assets/fonts/Sora-SemiBold.ttf",
+            "./assets/fonts/Teachers-Bold.ttf",
+            "./assets/fonts/Teachers-BoldItalic.ttf",
+            "./assets/fonts/Teachers-ExtraBold.ttf",
+            "./assets/fonts/Teachers-ExtraBoldItalic.ttf",
+            "./assets/fonts/Teachers-Italic.ttf",
+            "./assets/fonts/Teachers-Medium.ttf",
+            "./assets/fonts/Teachers-MediumItalic.ttf",
+            "./assets/fonts/Teachers-Regular.ttf",
+            "./assets/fonts/Teachers-SemiBold.ttf",
+            "./assets/fonts/Teachers-SemiBoldItalic.ttf"
+          ]
         }
       ]
     ],
