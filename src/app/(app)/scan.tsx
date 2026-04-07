@@ -1,7 +1,13 @@
 import colors from '@/constants/colors';
+import { useAxiosRequest } from '@/hooks';
 import { layout } from '@/styles/common';
 import { fonts, typography } from '@/styles/typography';
+import { BarcodeScanningResult, CameraView, useCameraPermissions } from 'expo-camera';
+import * as Location from 'expo-location';
+import { useRouter } from 'expo-router';
+import { useCallback, useState } from 'react';
 import {
+    ActivityIndicator,
     Dimensions,
     Image,
     Pressable,
@@ -11,14 +17,6 @@ import {
     View,
 } from 'react-native';
 import Svg, { Mask, Rect } from 'react-native-svg';
-// import Toast from 'react-native-toast-message';
-// import { FacialScanScreenProps, IDFrontScanScreenProps } from '@/types';
-// import { cropPhoto } from '@/utils';
-// import { useOnboardingForm } from '@/context/UserFormContext';
-// import { useIsPhysicalDevice } from '@/hooks';
-// import { useAxiosRequest } from '@/hooks';
-import { CameraView, useCameraPermissions } from 'expo-camera';
-import { useRouter } from 'expo-router';
 
 const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
 
@@ -29,7 +27,26 @@ export const unstable_settings = {
 
 export default function Scan() {
     const [permission, requestPermission] = useCameraPermissions();
-    // const { sendRequest, loading } = useAxiosRequest<{ selfiefileId: string }>();
+    const { sendRequest, loading: reqLoading } = useAxiosRequest<
+        {
+            isGenuine: Boolean;
+            message: string;
+            productName: string;
+            sku: string;
+            category: string;
+            batchNumber: number;
+            manufacturingDate: string;
+            expiryDate: string;
+            tenantName: string;
+            verificationCount: number;
+        },
+        {
+            codeValue: string;
+            latitude: number | null;
+            longitude: number | null;
+            locationName: string;
+        }
+    >();
     // const {
     //     state: { token },
     // } = useOnboardingForm();
@@ -40,10 +57,114 @@ export default function Scan() {
     const rectX = (windowWidth - rectWidth) / 2;
     const rectY = (windowHeight - rectHeight * 1.5) / 2;
     const router = useRouter();
-    // useEffect(() => {
-    //     // router.navigate('/home/fake-product-detail');
-    //     router.navigate('/home/fake-product-detail');
-    // }, [router]);
+    const [loading, setLoading] = useState(false);
+    // const [scanned, setScanned] = useState(false);
+    const barcodeScannedHandler = useCallback(
+        async (details: BarcodeScanningResult) => {
+            setLoading(true);
+
+            let locationName = 'Unknown location';
+            let latitude: number | null = null;
+            let longitude: number | null = null;
+
+            try {
+                // Request permission only once; ideally call this on scan screen mount
+                const { status } = await Location.requestForegroundPermissionsAsync();
+
+                if (status === 'granted') {
+                    // Fetch location with a timeout (5s max)
+                    const currentLocation = await Promise.race([
+                        Location.getCurrentPositionAsync({}),
+                        new Promise<null>((_, reject) =>
+                            setTimeout(() => reject('Location timeout'), 5000),
+                        ),
+                    ]);
+
+                    if (currentLocation) {
+                        latitude = currentLocation.coords.latitude;
+                        longitude = currentLocation.coords.longitude;
+
+                        const places = await Location.reverseGeocodeAsync({
+                            latitude,
+                            longitude,
+                        });
+
+                        // if (places.length > 0) {
+                        //     const place = places[0];
+                        //     // Build a readable location name with district/city/region/country
+                        //     locationName = [
+                        //         place.district,
+                        //         place.city,
+                        //         place.region,
+                        //         place.country,
+                        //     ]
+                        //         .filter(Boolean)
+                        //         .join(', ');
+                        // }
+                        locationName = places[0].formattedAddress ?? 'Unknown location';
+                    }
+                }
+            } catch (locError) {
+                console.log('Location error (ignored, scan will continue):', locError);
+            }
+
+            try {
+                // Send scan to your API
+                const res = await sendRequest({
+                    url: 'api/v1/client/Product/scan',
+                    method: 'POST',
+                    data: {
+                        codeValue: details.data,
+                        latitude,
+                        longitude,
+                        locationName,
+                    },
+                });
+
+                const scanResult = res.result as {
+                    isGenuine?: boolean;
+                    status?: string;
+                    message?: string;
+                    productName?: string;
+                    sku?: string;
+                    category?: string;
+                    batchNumber?: number;
+                    manufacturingDate?: string;
+                    expiryDate?: string;
+                    tenantName?: string;
+                    verificationCount?: number;
+                } | null;
+
+                const isGenuine = Boolean(
+                    scanResult?.isGenuine === true ||
+                    scanResult?.status === 'Genuine' ||
+                    scanResult?.status === 'genuine' ||
+                    scanResult?.status === 'Valid' ||
+                    scanResult?.status === 'valid',
+                );
+
+                const payloadWithLocation = {
+                    ...(scanResult ?? {}),
+                    locationName,
+                    latitude,
+                    longitude,
+                };
+
+                const encodedPayload = encodeURIComponent(JSON.stringify(payloadWithLocation));
+
+                // Navigate to product detail
+                router.push(
+                    `/home/product-detail?isGenuine=${isGenuine}&productData=${encodedPayload}`,
+                );
+            } catch (apiError) {
+                console.log('Scan API error:', apiError);
+            } finally {
+                setLoading(false);
+            }
+        },
+        [sendRequest, router],
+    );
+
     return (
         <View style={{ flex: 1, backgroundColor: colors.light.primaryDark }}>
             <Pressable
@@ -65,15 +186,30 @@ export default function Scan() {
             <View style={layout.flex1}>
                 {/* <Header /> */}
 
-                <CameraView
-                    style={StyleSheet.absoluteFill}
-                    barcodeScannerSettings={{
-                        barcodeTypes: ['qr'],
-                    }}
-                    onBarcodeScanned={(details) => {
-                        router.navigate('/home/genuine-product-detail');
-                    }}
-                />
+                {loading ? (
+                    <View
+                        style={{
+                            position: 'absolute',
+                            zIndex: 2,
+                            top: 0,
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <ActivityIndicator size={'large'} color={colors.light.white} />
+                    </View>
+                ) : (
+                    <CameraView
+                        style={StyleSheet.absoluteFill}
+                        barcodeScannerSettings={{
+                            barcodeTypes: ['qr'],
+                        }}
+                        onBarcodeScanned={barcodeScannedHandler}
+                    />
+                )}
 
                 {/* === Dark overlay with transparent center === */}
                 <Svg

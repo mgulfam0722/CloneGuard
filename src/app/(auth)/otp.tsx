@@ -1,25 +1,19 @@
 import { Button, Header } from '@/components';
 import colors from '@/constants/colors';
+import { useCountDown } from '@/hooks';
+import { useAxiosRequest } from '@/hooks/useAxiosRequest';
 import { layout } from '@/styles/common';
 import { fonts, typography } from '@/styles/typography';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { OtpInput } from 'react-native-otp-entry';
-// import Toast from 'react-native-toast-message';
-// import { useAxiosRequest } from '@/hooks';
-// import { useOnboardingForm } from '@/context/UserFormContext';
-// import { OTPScreenProps } from '@/types';
-import { useCountDown } from '@/hooks';
-import { useAxiosRequest } from '@/hooks/useAxiosRequest';
-import { useSessionStore } from '@/stores';
-import { useLocalSearchParams, useRouter } from 'expo-router';
 
 export default function OTP() {
     const [isResendCodeButtonVisible, setResendCodeButtonVisible] = useState(false);
     const [secondsLeft, setSecondsLeft] = useState(20);
     const [otp, setOTP] = useState('');
     const router = useRouter();
-    const { signIn } = useSessionStore();
     const { email } = useLocalSearchParams<{ email: string }>();
 
     const { sendRequest, loading } = useAxiosRequest<

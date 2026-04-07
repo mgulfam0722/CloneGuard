@@ -190,36 +190,52 @@ export default function Home() {
                         </View>
                     </View>
 
-                    {/* <View style={{
-                    paddingHorizontal: 50,
-                    marginTop: 20,
-                }}>
-                    <Text style={{
-                        fontFamily: fonts.TeachersBold,
-                        fontSize: 16,
-                        color: 'white',
-                        padding: 5
-                    }}>Recent Scans</Text>
-                    <View style={{
-                        borderWidth: 1,
-                        borderColor: 'rgba(218, 218, 218, 1)',
-                        padding: 10,
-                        borderRadius: 11
-                    }}>
-                        <Text style={{
-                        fontFamily: fonts.TeachersRegular,
-                        fontSize: 14,
-                        color: 'white',
-                        padding: 5
-                    }}>Panadol Extra 500mg</Text>
-                        <Text style={{
-                        fontFamily: fonts.TeachersRegular,
-                        fontSize: 14,
-                        color: 'white',
-                        padding: 5
-                    }}>Genuine • 2 hrs ago • Saddar, Karachi</Text>
+                    <View
+                        style={{
+                            paddingHorizontal: 50,
+                            marginTop: 20,
+                        }}
+                    >
+                        <Text
+                            style={{
+                                fontFamily: fonts.TeachersBold,
+                                fontSize: 16,
+                                color: 'white',
+                                padding: 5,
+                            }}
+                        >
+                            Recent Scans
+                        </Text>
+                        <View
+                            style={{
+                                borderWidth: 1,
+                                borderColor: 'rgba(218, 218, 218, 1)',
+                                padding: 10,
+                                borderRadius: 11,
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    fontFamily: fonts.TeachersRegular,
+                                    fontSize: 14,
+                                    color: 'white',
+                                    padding: 5,
+                                }}
+                            >
+                                Panadol Extra 500mg
+                            </Text>
+                            <Text
+                                style={{
+                                    fontFamily: fonts.TeachersRegular,
+                                    fontSize: 14,
+                                    color: 'white',
+                                    padding: 5,
+                                }}
+                            >
+                                Genuine • 2 hrs ago • Saddar, Karachi
+                            </Text>
+                        </View>
                     </View>
-                </View> */}
                 </ScrollView>
             </View>
         </ImageBackground>
