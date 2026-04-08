@@ -116,6 +116,7 @@ export default function LoginScreen() {
                 <KeyboardAwareScrollView
                     contentContainerStyle={styles.scrollContent}
                     bottomOffset={Platform.select({ ios: 80, android: 100 })}
+                    showsVerticalScrollIndicator={false}
                 >
                     <View>
                         <View
@@ -159,12 +160,6 @@ export default function LoginScreen() {
                                         onBlur: field.onBlur,
                                         keyboardType: 'email-address',
                                         autoCapitalize: 'none',
-                                        // style: {
-                                        //     color: colors.light.gray600,
-                                        //     marginVertical: 0,
-                                        //     fontFamily: fonts.TeachersRegular,
-                                        //     fontSize: 17,
-                                        // },
                                     }}
                                 />
                             )}
@@ -180,17 +175,12 @@ export default function LoginScreen() {
                                 <Input
                                     placeholderText="Password"
                                     containerStyle={styles.passwordContainer}
+                                    isPassword={true}
                                     isPasswordHidden={isPasswordHidden}
                                     props={{
                                         value: field.value,
                                         onChangeText: field.onChange,
                                         ...passwordInputProps,
-                                        style: {
-                                            color: colors.light.gray600,
-                                            marginVertical: 0,
-                                            fontFamily: fonts.TeachersRegular,
-                                            fontSize: 17,
-                                        },
                                     }}
                                     icon={passwordIcon}
                                 />

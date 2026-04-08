@@ -1,3 +1,4 @@
+import { Button } from '@/components';
 import colors from '@/constants/colors';
 import { useAxiosRequest } from '@/hooks';
 import { layout } from '@/styles/common';
@@ -13,8 +14,7 @@ import {
     Pressable,
     StyleSheet,
     Text,
-    TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 import Svg, { Mask, Rect } from 'react-native-svg';
 
@@ -153,8 +153,8 @@ export default function Scan() {
                 const encodedPayload = encodeURIComponent(JSON.stringify(payloadWithLocation));
 
                 // Navigate to product detail
-                router.push(
-                    `/home/product-detail?isGenuine=${isGenuine}&productData=${encodedPayload}`,
+                router.replace(
+                    `/product-detail?isGenuine=${isGenuine}&productData=${encodedPayload}`,
                 );
             } catch (apiError) {
                 console.log('Scan API error:', apiError);
@@ -239,14 +239,19 @@ export default function Scan() {
                 </Svg>
 
                 {/* === Overlay content === */}
-                <View style={[StyleSheet.absoluteFill, styles.overlay]}>
+                <View style={[StyleSheet.absoluteFill, styles.overlay, !permission?.granted && {
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: colors.light.primaryDark
+                }]}>
                     {!permission?.granted ? (
-                        <TouchableOpacity
-                            onPress={requestPermission}
-                            style={styles.permissionButton}
-                        >
-                            <Text style={styles.permissionText}>Grant Camera Permission</Text>
-                        </TouchableOpacity>
+                        <Button
+                            onPressCallback={requestPermission}
+                            title='Grant permission to use camera'
+                            style={{
+                                margin: 20,
+                            }}
+                        />
                     ) : (
                         <>
                             <View

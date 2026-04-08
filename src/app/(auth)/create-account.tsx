@@ -1,15 +1,14 @@
 import { Button, Checkbox, Header, Input, PhoneInput } from '@/components';
 import colors from '@/constants/colors';
 import { useAxiosRequest } from '@/hooks/useAxiosRequest';
-import { useSessionStore } from '@/stores';
 import { layout } from '@/styles/common';
 import { fonts, typography } from '@/styles/typography';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 import { KeyboardAwareScrollView, KeyboardProvider } from 'react-native-keyboard-controller';
 import { z } from 'zod';
@@ -79,7 +78,6 @@ type SignupResponse = {
 export default function CreateAccount() {
     const [isChecked, setIsChecked] = useState(false);
     const router = useRouter();
-    const { signIn } = useSessionStore();
 
     const { sendRequest, loading } = useAxiosRequest<
         SignupResponse,
@@ -97,7 +95,6 @@ export default function CreateAccount() {
         control,
         handleSubmit,
         formState: { errors, isValid },
-        watch,
     } = useForm<CreateAccountFormData>({
         resolver: zodResolver(createAccountSchema),
         mode: 'onChange',
@@ -148,6 +145,41 @@ export default function CreateAccount() {
             // Error handling is already done in the useAxiosRequest hook
         }
     };
+    
+    const [passwordVisible, setPasswordVisible] = useState(false);
+    const [confirmPasswordVsible, setConfirmPasswordVisible] = useState(false);
+    const passwordIcon = useMemo(
+        () => (
+            <TouchableOpacity
+                style={styles.eyeIconContainer}
+                onPress={() => setPasswordVisible((v) => !v)}
+            >
+                <Ionicons
+                    name={passwordVisible ? 'eye' : 'eye-off'}
+                    size={20}
+                    color={colors.light.secondaryColor}
+                />
+            </TouchableOpacity>
+        ),
+        [passwordVisible],
+    );
+
+    const confirmPasswordIcon = useMemo(
+        () => (
+            <TouchableOpacity
+                style={styles.eyeIconContainer}
+                onPress={() => setConfirmPasswordVisible((v) => !v)}
+            >
+                <Ionicons
+                    name={confirmPasswordVsible ? 'eye' : 'eye-off'}
+                    size={20}
+                    color={colors.light.secondaryColor}
+                />
+            </TouchableOpacity>
+        ),
+        [confirmPasswordVsible],
+    );
+
     return (
         <KeyboardProvider>
             <View
@@ -269,20 +301,16 @@ export default function CreateAccount() {
                                 <Input
                                     title="Password"
                                     placeholderText="Create a password"
-                                    isPasswordHidden={true}
+                                    isPassword={true}
+                                    isPasswordHidden={passwordVisible}
                                     props={{
                                         autoCapitalize: 'none',
                                         value,
                                         onChangeText: onChange,
                                         onBlur: onBlur,
+                                        secureTextEntry: passwordVisible
                                     }}
-                                    icon={
-                                        <Ionicons
-                                            name="eye-off"
-                                            size={20}
-                                            color={colors.light.gray600}
-                                        />
-                                    }
+                                    icon={passwordIcon}
                                 />
                             )}
                         />
@@ -295,22 +323,18 @@ export default function CreateAccount() {
                             name="confirmPassword"
                             render={({ field: { onChange, onBlur, value } }) => (
                                 <Input
+                                    isPassword={true}
                                     title="Confirm Password"
                                     placeholderText="Re-enter your password"
-                                    isPasswordHidden={true}
+                                    isPasswordHidden={confirmPasswordVsible}
                                     props={{
                                         autoCapitalize: 'none',
                                         value,
                                         onChangeText: onChange,
                                         onBlur: onBlur,
+                                        secureTextEntry: confirmPasswordVsible
                                     }}
-                                    icon={
-                                        <Ionicons
-                                            name="eye-off"
-                                            size={20}
-                                            color={colors.light.gray600}
-                                        />
-                                    }
+                                    icon={confirmPasswordIcon}
                                 />
                             )}
                         />
@@ -376,17 +400,16 @@ export default function CreateAccount() {
                             </Text>
                         </View>
 
-                        <Button
-                            title={loading ? 'Creating Account...' : 'Create Account'}
+                        {loading ? <ActivityIndicator style={{
+                            margin: 15
+                        }} size={'large'} color={colors.light.white} /> : <Button
+                            title={'Create Account'}
                             style={{
                                 paddingHorizontal: 15,
                                 marginTop: 30,
                             }}
                             onPressCallback={handleSubmit(onSubmit)}
-                            // props={{
-                            //     disabled: !isValid || !isChecked || loading
-                            // }}
-                        />
+                        />}
                     </View>
                 </KeyboardAwareScrollView>
             </View>
@@ -423,5 +446,13 @@ const styles = StyleSheet.create({
         marginTop: 5,
         marginLeft: 16,
         marginBottom: 10,
+    },
+    eyeIconContainer: {
+        position: 'absolute',
+        right: 10,
+        top: 0,
+        bottom: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });

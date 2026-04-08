@@ -1,6 +1,7 @@
 import colors from '@/constants/colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import Octicons from '@expo/vector-icons/Octicons';
 import { Tabs } from 'expo-router';
 import { StyleSheet } from 'react-native';
 
@@ -21,7 +22,8 @@ export default function TabLayout() {
                 options={{
                     title: 'Home',
                     tabBarIcon: ({ color }) => (
-                        <Ionicons size={28} name="home-outline" color={color} />
+                        // <Ionicons size={28} name="home-outline" color={color} />
+                        <Octicons name="home" size={28} color={color} />
                     ),
                     headerShown: false,
                 }}

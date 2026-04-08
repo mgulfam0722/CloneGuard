@@ -2,6 +2,7 @@ import colors from '@/constants/colors';
 import { useListScans } from '@/hooks';
 import { layout } from '@/styles/common';
 import { fonts } from '@/styles/typography';
+import { ScanItemState } from '@/types';
 import Feather from '@expo/vector-icons/Feather';
 import { useState } from 'react';
 import {
@@ -77,7 +78,13 @@ export default function History() {
                                       backgroundColor: 'transparent',
                                   }
                         }
-                        onPress={() => setSelectedFilter('All')}
+                        onPress={() => {
+                            setSelectedFilter('All');
+                            dispatch({
+                                type: 'STATUS',
+                                payload: ScanItemState.All
+                            })
+                        }}
                     >
                         <Text
                             style={{
@@ -99,7 +106,13 @@ export default function History() {
                                       backgroundColor: 'transparent',
                                   }
                         }
-                        onPress={() => setSelectedFilter('Genuine')}
+                        onPress={() => {
+                            setSelectedFilter('Genuine');
+                            dispatch({
+                                type: 'STATUS',
+                                payload: ScanItemState.Genuine
+                            })
+                        }}
                     >
                         <Text
                             style={{
@@ -121,7 +134,13 @@ export default function History() {
                                       backgroundColor: 'transparent',
                                   }
                         }
-                        onPress={() => setSelectedFilter('Fake')}
+                        onPress={() => {
+                            setSelectedFilter('Fake');
+                            dispatch({
+                                type: 'STATUS',
+                                payload: ScanItemState.Fake
+                            })
+                        }}
                     >
                         <Text
                             style={{
@@ -153,6 +172,10 @@ export default function History() {
                                 }}
                             />
                         }
+                        ListEmptyComponent={() => !scansLoading && <Text style={{
+                            textAlign: 'center',
+                            padding: 20
+                        }}>No records!</Text>}
                         renderItem={({ item }) => (
                             <View
                                 style={{

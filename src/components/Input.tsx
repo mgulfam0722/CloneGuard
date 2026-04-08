@@ -26,7 +26,9 @@ type BaseProps = {
 };
 
 type PasswordProps = {
+    isPassword: true;
     isPasswordHidden: boolean;
+    togglePasswordHidden?: () => void;
 };
 
 type NonPasswordProps = {
@@ -49,6 +51,7 @@ export function Input({
     icon = null,
     footer = null,
     titleStyle = undefined,
+    isPassword=false
 }: InputProps) {
     return (
         <View style={containerStyle}>
@@ -61,7 +64,7 @@ export function Input({
                     autoCorrect={false}
                     autoCapitalize="none"
                     autoComplete="off"
-                    secureTextEntry={isPasswordHidden}
+                    secureTextEntry={isPassword ? isPasswordHidden : false}
                     placeholderTextColor={colors.light.gray600}
                     {...props}
                 />

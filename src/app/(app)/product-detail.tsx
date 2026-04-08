@@ -113,11 +113,23 @@ export default function ProductDetail() {
                                 {isGenuineBool ? (
                                     <Feather
                                         name="check-circle"
-                                        size={24}
+                                        size={30}
                                         color={colors.light.white}
+                                        onPress={() => {
+                                            router.replace('/home');
+                                        }}
                                     />
                                 ) : (
-                                    <Entypo name="circle-with-cross" size={20} color="#D36C64" />
+                                    <View>
+                                        <Entypo
+                                            name="circle-with-cross"
+                                            size={30}
+                                            color="#D36C64"
+                                            onPress={() => {
+                                                router.replace('/home');
+                                            }}
+                                        />
+                                    </View>
                                 )}
                             </View>
                         </View>
@@ -148,7 +160,7 @@ export default function ProductDetail() {
             >
                 <ScrollView
                     contentContainerStyle={{
-                        paddingBottom: 100 * scaleFactor,
+                        // paddingBottom: 100 * scaleFactor,
                     }}
                     showsVerticalScrollIndicator={false}
                 >
@@ -419,7 +431,7 @@ export default function ProductDetail() {
 
                             <View
                                 style={{
-                                    marginTop: 30 * scaleFactor,
+                                    marginTop: 10 * scaleFactor,
                                     paddingHorizontal: 30 * scaleFactor,
                                 }}
                             >
@@ -473,7 +485,7 @@ export default function ProductDetail() {
                                             color: '#7F241E',
                                         }}
                                     >
-                                        Your location logged to help authorities
+                                        Your location has been logged to help authorities
                                     </Text>
                                 </View>
                             </View>
@@ -484,7 +496,7 @@ export default function ProductDetail() {
                                     marginTop: 30 * scaleFactor,
                                 }}
                                 onPressCallback={() => {
-                                    router.navigate('/home/report-product');
+                                    router.navigate('/report-product');
                                 }}
                                 title="Report this product"
                             />

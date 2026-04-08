@@ -1,7 +1,7 @@
 export enum ScanItemState {
     All = 'all',
     Genuine = 'genuine',
-    fake = 'fake',
+    Fake = 'fake',
 }
 
 export type ScanItem = {

@@ -3,8 +3,6 @@ import { useSessionStore } from '@/stores';
 import { ScanActionPayload, ScanItem, ScanItemState, ScanReducerState } from '@/types';
 import { useEffect, useReducer } from 'react';
 
-const LIMIT = 10;
-
 const reducer = (state: ScanReducerState, action: ScanActionPayload): ScanReducerState => {
     switch (action.type) {
         case 'PAGE':
@@ -34,7 +32,7 @@ const reducer = (state: ScanReducerState, action: ScanActionPayload): ScanReduce
     }
 };
 
-export function useListScans(status: ScanItemState = ScanItemState.All) {
+export function useListScans(status: ScanItemState = ScanItemState.All, limit = 10) {
     const [state, dispatch] = useReducer(reducer, {
         page: 1,
         status,
@@ -49,14 +47,12 @@ export function useListScans(status: ScanItemState = ScanItemState.All) {
     useEffect(() => {
         async function fetchBookings() {
             try {
-                const url = `api/v1/client/Product/scan-history?page=${state.page}&limit=${LIMIT}&status=${state.status}`;
+                const url = `api/v1/client/Product/scan-history?page=${state.page}&pageSize=${limit}&status=${state.status}`;
 
                 const result = await sendRequest({
                     url,
                     method: 'GET',
                 });
-
-                console.log(result);
 
                 const items = result?.result ?? [];
 
