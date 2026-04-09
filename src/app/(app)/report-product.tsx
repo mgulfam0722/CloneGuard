@@ -40,13 +40,14 @@ export default function ReportProduct() {
                             alignItems: 'center',
                             justifyContent: 'space-between',
                             paddingHorizontal: 20,
-                            marginTop: 30,
+                            paddingVertical: 15,
+                            backgroundColor: '#7F241E',
                         }}
                     >
                         <Text
                             style={{
                                 fontFamily: fonts.TeachersSemiBold,
-                                color: 'black',
+                                color: colors.light.white,
                                 fontSize: 30 * fontScale,
                                 lineHeight: 43 * fontScale,
                                 width: '70%',

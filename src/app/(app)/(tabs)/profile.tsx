@@ -56,8 +56,11 @@ export default function Profile() {
                             Profile
                         </Text>
                         <View>
-                            <FontAwesome name="user-o" size={30}
-                                color={colors.light.primaryColor} />
+                            <FontAwesome
+                                name="user-o"
+                                size={30}
+                                color={colors.light.primaryColor}
+                            />
                         </View>
                     </View>
                     <View
@@ -115,25 +118,21 @@ export default function Profile() {
                             title="Submit"
                             style={{
                                 marginTop: 20 * scaleFactor,
-                                backgroundColor: colors.light.primaryDark
+                                backgroundColor: colors.light.primaryDark,
                             }}
                         />
                         <Button
                             title="Log Out"
                             style={{
                                 backgroundColor: '#7F241E',
-                                marginTop: 20
+                                marginTop: 20,
                             }}
                             onPressCallback={() => {
                                 // signOut();
-                                Alert.alert(
-                                    "Confirm Logout",
-                                    "Are you sure you want to log out?",
-                                    [
-                                        { text: 'No' },
-                                        { text: 'Yes', onPress: () => signOut() }
-                                    ]
-                                )
+                                Alert.alert('Confirm Logout', 'Are you sure you want to log out?', [
+                                    { text: 'No' },
+                                    { text: 'Yes', onPress: () => signOut() },
+                                ]);
                             }}
                         />
                     </View>

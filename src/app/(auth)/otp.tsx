@@ -2,10 +2,11 @@ import { Button, Header } from '@/components';
 import colors from '@/constants/colors';
 import { useCountDown } from '@/hooks';
 import { useAxiosRequest } from '@/hooks/useAxiosRequest';
+import { useSessionStore } from '@/stores';
 import { layout } from '@/styles/common';
 import { fonts, typography } from '@/styles/typography';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { OtpInput } from 'react-native-otp-entry';
 
@@ -14,12 +15,14 @@ export default function OTP() {
     const [secondsLeft, setSecondsLeft] = useState(20);
     const [otp, setOTP] = useState('');
     const router = useRouter();
-    const { email } = useLocalSearchParams<{ email: string }>();
-
+    const { email, flow = 'signup' } = useLocalSearchParams<{ email: string; flow?: string }>();
+    console.log('flow: ', flow);
     const { sendRequest, loading } = useAxiosRequest<
         {
-            token?: string;
-            user?: any;
+            accessToken: string | null;
+            resetToken: string | null;
+            fullName: string;
+            role: string;
         },
         {
             Email: string;
@@ -37,21 +40,21 @@ export default function OTP() {
     const minutes = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
     const seconds = String(secondsLeft % 60).padStart(2, '0');
 
-    // const resendOTP = useCallback(async () => {
-    //     const { message, status } = await sendRequest({
-    //         method: 'POST',
-    //         url: '/api/client/auth/SendOtp',
-    //         data: {
-    //             mobNumber: mobileNumber,
-    //         },
-    //     });
-    //     Toast.show({
-    //         type: status ? 'info' : 'error',
-    //         text1: message,
-    //     });
-    //     setSecondsLeft(20);
-    //     setResendCodeButtonVisible(false);
-    // }, [mobileNumber]);
+    const setResetToken = useSessionStore((store) => store.setResetToken);
+
+    const { sendRequest: sendOTPReq, loading: sendOTPLoading } = useAxiosRequest();
+
+    const resendOTP = useCallback(async () => {
+        const { message, status } = await sendOTPReq({
+            method: 'POST',
+            url: '/api/v1/client/Auth/forgot-password',
+            data: {
+                email,
+            },
+        });
+        setSecondsLeft(20);
+        setResendCodeButtonVisible(false);
+    }, [email]);
 
     return (
         <View style={layout.fill}>
@@ -106,7 +109,7 @@ export default function OTP() {
             {isResendCodeButtonVisible ? (
                 <View style={styles.timerContainer}>
                     <Text style={styles.timerText}>I didn’t receive a code. </Text>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={resendOTP}>
                         <Text style={styles.timer}>Resend</Text>
                     </TouchableOpacity>
                 </View>
@@ -135,8 +138,18 @@ export default function OTP() {
                                             OtpCode: otp,
                                         },
                                     });
+                                    console.log('response: ', response);
                                     if (response.status) {
-                                        router.replace('/login');
+                                        if (flow !== 'signup' && response.result.resetToken) {
+                                            setResetToken(response.result.resetToken);
+                                            // router.replace('/reset-password');
+                                            router.navigate({
+                                                pathname: '/reset-password',
+                                                params: { email, flow: 'forgot-password' },
+                                            });
+                                        } else {
+                                            router.replace('/login');
+                                        }
                                     }
                                 } catch (error) {
                                     console.error('OTP verification failed:', error);

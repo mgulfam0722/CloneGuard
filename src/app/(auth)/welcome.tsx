@@ -17,9 +17,14 @@ import Animated, {
     withTiming,
 } from 'react-native-reanimated';
 
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import colors from 'src/constants/colors';
 import { layout } from 'src/styles/common';
 import { fonts } from 'src/styles/typography';
+
+const { width } = Dimensions.get('window');
+const scaleFactor = width / 375;
+const fontScale = Math.min(scaleFactor, 1.2);
 
 export default function Welcome() {
     const router = useRouter();
@@ -77,6 +82,86 @@ export default function Welcome() {
                     },
                 ]}
             >
+                <View
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        bottom: 0,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        width: '100%',
+                    }}
+                >
+                    <Text
+                        style={{
+                            fontFamily: fonts.TeachersBold,
+                            letterSpacing: -4,
+                            fontSize: fontScale * 68,
+                            color: colors.light.white,
+                            padding: 15,
+                        }}
+                    >
+                        Authentify
+                    </Text>
+                    <View>
+                        <Text
+                            style={{
+                                color: colors.light.white,
+                                textAlign: 'center',
+                                fontFamily: fonts.TeachersMedium,
+                                fontSize: 15,
+                            }}
+                        >
+                            Instantly verify any product is real before you buy or consume it
+                        </Text>
+                    </View>
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            marginTop: 10,
+                        }}
+                    >
+                        <MaterialCommunityIcons
+                            name="gift-open-outline"
+                            size={24}
+                            color={colors.light.secondaryColor}
+                        />
+                        <Text
+                            style={{
+                                marginLeft: 5,
+                                fontFamily: fonts.TeachersSemiBold,
+                                color: colors.light.white,
+                                fontSize: 14,
+                            }}
+                        >
+                            Join & earn rewards
+                        </Text>
+                    </View>
+                    <View
+                        style={{
+                            padding: 25,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            backgroundColor: '#11454C',
+                            marginHorizontal: 15,
+                            borderWidth: 1,
+                            borderColor: '#32AB45',
+                            marginTop: 20,
+                            borderRadius: 15,
+                        }}
+                    >
+                        <Text
+                            style={{
+                                textAlign: 'center',
+                                color: colors.light.white,
+                                fontFamily: fonts.TeachersRegular,
+                            }}
+                        >
+                            Get 100 pts free on sign-up. Earn more with every scan you make.
+                        </Text>
+                    </View>
+                </View>
                 <View style={styles.container}>
                     <View style={styles.track} onLayout={onLayoutTrack}>
                         <Text style={styles.text}>Get started</Text>
@@ -112,6 +197,17 @@ const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
         marginBottom: 50,
+        // borderWidth: 3,
+        // borderColor: 'red',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+
+        elevation: 5,
     },
     track: {
         flexDirection: 'row',
@@ -139,7 +235,7 @@ const styles = StyleSheet.create({
         height: 48,
         width: 48,
         borderRadius: 40,
-        backgroundColor: colors.light.primaryDark,
+        backgroundColor: colors.light.secondaryColor,
         justifyContent: 'center',
         alignItems: 'center',
         shadowColor: '#000',

@@ -7,9 +7,12 @@ type SessionState = {
     isLoading: boolean;
     isAuthenticated: boolean;
     fullName: string;
+    resetToken: string | null;
     restoreSession: () => Promise<void>;
     signIn: (token: string, fullName: string) => Promise<void>;
     signOut: () => Promise<void>;
+    setResetToken: (token: string) => void;
+    clearResetToken: () => void;
 };
 
 const SESSION_DURATION = 24 * 60 * 60 * 7 * 1000; // 7 days in ms
@@ -20,6 +23,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     isLoading: true,
     isAuthenticated: false,
     fullName: '',
+    resetToken: null,
 
     restoreSession: async () => {
         try {
@@ -119,4 +123,14 @@ export const useSessionStore = create<SessionState>((set, get) => ({
             isAuthenticated: false,
         });
     },
+
+    setResetToken: (token: string) =>
+        set({
+            resetToken: token,
+        }),
+
+    clearResetToken: () =>
+        set({
+            resetToken: null,
+        }),
 }));

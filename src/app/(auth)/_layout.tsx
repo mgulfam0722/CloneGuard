@@ -9,11 +9,11 @@ SplashScreen.setOptions({
 
 export default function RootLayout() {
     return (
-        <Stack initialRouteName="welcome">
-            <Stack.Screen name="welcome" options={{ headerShown: false }} />
-            <Stack.Screen name="login" options={{ headerShown: false }} />
-            <Stack.Screen name="otp" options={{ headerShown: false }} />
-            <Stack.Screen name="create-account" options={{ headerShown: false }} />
-        </Stack>
+        <Stack
+            initialRouteName="welcome"
+            screenOptions={{
+                headerShown: false,
+            }}
+        />
     );
 }

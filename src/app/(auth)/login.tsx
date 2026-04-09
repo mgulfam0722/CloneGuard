@@ -190,7 +190,11 @@ export default function LoginScreen() {
                             <Text style={typography.error}>{errors.password.message}</Text>
                         )}
 
-                        <TouchableOpacity onPress={() => {}}>
+                        <TouchableOpacity
+                            onPress={() => {
+                                router.navigate('/forgot-password');
+                            }}
+                        >
                             <Text
                                 style={[
                                     typography.body,

@@ -51,7 +51,7 @@ export function Input({
     icon = null,
     footer = null,
     titleStyle = undefined,
-    isPassword=false
+    isPassword = false,
 }: InputProps) {
     return (
         <View style={containerStyle}>

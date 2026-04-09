@@ -82,8 +82,8 @@ export default function History() {
                             setSelectedFilter('All');
                             dispatch({
                                 type: 'STATUS',
-                                payload: ScanItemState.All
-                            })
+                                payload: ScanItemState.All,
+                            });
                         }}
                     >
                         <Text
@@ -110,8 +110,8 @@ export default function History() {
                             setSelectedFilter('Genuine');
                             dispatch({
                                 type: 'STATUS',
-                                payload: ScanItemState.Genuine
-                            })
+                                payload: ScanItemState.Genuine,
+                            });
                         }}
                     >
                         <Text
@@ -138,8 +138,8 @@ export default function History() {
                             setSelectedFilter('Fake');
                             dispatch({
                                 type: 'STATUS',
-                                payload: ScanItemState.Fake
-                            })
+                                payload: ScanItemState.Fake,
+                            });
                         }}
                     >
                         <Text
@@ -172,10 +172,18 @@ export default function History() {
                                 }}
                             />
                         }
-                        ListEmptyComponent={() => !scansLoading && <Text style={{
-                            textAlign: 'center',
-                            padding: 20
-                        }}>No records!</Text>}
+                        ListEmptyComponent={() =>
+                            !scansLoading && (
+                                <Text
+                                    style={{
+                                        textAlign: 'center',
+                                        padding: 20,
+                                    }}
+                                >
+                                    No records!
+                                </Text>
+                            )
+                        }
                         renderItem={({ item }) => (
                             <View
                                 style={{

@@ -159,11 +159,49 @@ export default function ProductDetail() {
                 }}
             >
                 <ScrollView
-                    contentContainerStyle={{
-                        // paddingBottom: 100 * scaleFactor,
-                    }}
+                    contentContainerStyle={
+                        {
+                            // paddingBottom: 100 * scaleFactor,
+                        }
+                    }
                     showsVerticalScrollIndicator={false}
                 >
+                    {isGenuineBool && (
+                        <View
+                            style={{
+                                padding: 25,
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                backgroundColor: '#11454C',
+                                marginHorizontal: 15,
+                                borderWidth: 1,
+                                borderColor: '#32AB45',
+                                marginTop: 20,
+                                borderRadius: 15,
+                                flexDirection: 'row',
+                                marginBottom: 15,
+                            }}
+                        >
+                            <Feather
+                                name="star"
+                                size={20}
+                                color={colors.light.white}
+                                style={{
+                                    position: 'absolute',
+                                    left: 20,
+                                }}
+                            />
+                            <Text
+                                style={{
+                                    textAlign: 'center',
+                                    color: colors.light.white,
+                                    fontFamily: fonts.TeachersSemiBold,
+                                }}
+                            >
+                                +10 pts earned! Balance: 360 pts
+                            </Text>
+                        </View>
+                    )}
                     <View
                         style={{
                             flexDirection: 'row',

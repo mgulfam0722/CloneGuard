@@ -14,7 +14,7 @@ import {
     Pressable,
     StyleSheet,
     Text,
-    View
+    View,
 } from 'react-native';
 import Svg, { Mask, Rect } from 'react-native-svg';
 
@@ -208,6 +208,7 @@ export default function Scan() {
                             barcodeTypes: ['qr'],
                         }}
                         onBarcodeScanned={barcodeScannedHandler}
+                        enableTorch={true}
                     />
                 )}
 
@@ -239,15 +240,21 @@ export default function Scan() {
                 </Svg>
 
                 {/* === Overlay content === */}
-                <View style={[StyleSheet.absoluteFill, styles.overlay, !permission?.granted && {
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundColor: colors.light.primaryDark
-                }]}>
+                <View
+                    style={[
+                        StyleSheet.absoluteFill,
+                        styles.overlay,
+                        !permission?.granted && {
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            backgroundColor: colors.light.primaryDark,
+                        },
+                    ]}
+                >
                     {!permission?.granted ? (
                         <Button
                             onPressCallback={requestPermission}
-                            title='Grant permission to use camera'
+                            title="Grant permission to use camera"
                             style={{
                                 margin: 20,
                             }}

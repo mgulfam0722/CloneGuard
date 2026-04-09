@@ -3,12 +3,20 @@ import colors from '@/constants/colors';
 import { useAxiosRequest } from '@/hooks/useAxiosRequest';
 import { layout } from '@/styles/common';
 import { fonts, typography } from '@/styles/typography';
+import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { ActivityIndicator, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+    ActivityIndicator,
+    Platform,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 import { KeyboardAwareScrollView, KeyboardProvider } from 'react-native-keyboard-controller';
 import { z } from 'zod';
@@ -145,7 +153,7 @@ export default function CreateAccount() {
             // Error handling is already done in the useAxiosRequest hook
         }
     };
-    
+
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [confirmPasswordVsible, setConfirmPasswordVisible] = useState(false);
     const passwordIcon = useMemo(
@@ -228,6 +236,48 @@ export default function CreateAccount() {
                         </View>
                     </View>
                 </View>
+                <View
+                    style={{
+                        padding: 25,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        backgroundColor: '#11454C',
+                        marginHorizontal: 15,
+                        borderWidth: 1,
+                        borderColor: '#32AB45',
+                        marginTop: 20,
+                        borderRadius: 15,
+                        flexDirection: 'row',
+                        marginBottom: 15,
+                    }}
+                >
+                    <Feather
+                        name="star"
+                        size={20}
+                        color={colors.light.white}
+                        style={{
+                            alignSelf: 'flex-start',
+                        }}
+                    />
+                    <Text
+                        style={{
+                            textAlign: 'center',
+                            color: colors.light.white,
+                            fontFamily: fonts.TeachersRegular,
+                        }}
+                    >
+                        <Text
+                            style={{
+                                textAlign: 'center',
+                                color: colors.light.white,
+                                fontFamily: fonts.TeachersSemiBold,
+                            }}
+                        >
+                            You'll earn 100pts instantly on account creation
+                        </Text>{' '}
+                        - redeemable for rewards.
+                    </Text>
+                </View>
                 <KeyboardAwareScrollView
                     contentContainerStyle={styles.scrollContent}
                     bottomOffset={Platform.select({ ios: 50, android: 100 })}
@@ -308,7 +358,7 @@ export default function CreateAccount() {
                                         value,
                                         onChangeText: onChange,
                                         onBlur: onBlur,
-                                        secureTextEntry: passwordVisible
+                                        secureTextEntry: passwordVisible,
                                     }}
                                     icon={passwordIcon}
                                 />
@@ -332,7 +382,7 @@ export default function CreateAccount() {
                                         value,
                                         onChangeText: onChange,
                                         onBlur: onBlur,
-                                        secureTextEntry: confirmPasswordVsible
+                                        secureTextEntry: confirmPasswordVsible,
                                     }}
                                     icon={confirmPasswordIcon}
                                 />
@@ -400,16 +450,24 @@ export default function CreateAccount() {
                             </Text>
                         </View>
 
-                        {loading ? <ActivityIndicator style={{
-                            margin: 15
-                        }} size={'large'} color={colors.light.white} /> : <Button
-                            title={'Create Account'}
-                            style={{
-                                paddingHorizontal: 15,
-                                marginTop: 30,
-                            }}
-                            onPressCallback={handleSubmit(onSubmit)}
-                        />}
+                        {loading ? (
+                            <ActivityIndicator
+                                style={{
+                                    margin: 15,
+                                }}
+                                size={'large'}
+                                color={colors.light.white}
+                            />
+                        ) : (
+                            <Button
+                                title={'Create Account'}
+                                style={{
+                                    paddingHorizontal: 15,
+                                    marginTop: 30,
+                                }}
+                                onPressCallback={handleSubmit(onSubmit)}
+                            />
+                        )}
                     </View>
                 </KeyboardAwareScrollView>
             </View>

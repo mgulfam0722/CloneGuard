@@ -1,7 +1,7 @@
-import { useAxiosRequest } from '@/hooks';
 import { useSessionStore } from '@/stores';
 import { ScanActionPayload, ScanItem, ScanItemState, ScanReducerState } from '@/types';
 import { useEffect, useReducer } from 'react';
+import { useAxiosRequest } from './useAxiosRequest';
 
 const reducer = (state: ScanReducerState, action: ScanActionPayload): ScanReducerState => {
     switch (action.type) {

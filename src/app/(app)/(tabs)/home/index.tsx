@@ -82,8 +82,11 @@ export default function Home() {
                             size={40 * scaleFactor}
                             color={colors.light.white}
                         /> */}
-                        <FontAwesome name="user-o" size={40 * scaleFactor}
-                            color={colors.light.white} />
+                        <FontAwesome
+                            name="user-o"
+                            size={40 * scaleFactor}
+                            color={colors.light.white}
+                        />
                     </View>
                 </View>
             </View>
@@ -109,6 +112,74 @@ export default function Home() {
                             justifyContent: 'center',
                         }}
                     >
+                        <View
+                            style={{
+                                backgroundColor: colors.light.secondaryColor,
+                                paddingHorizontal: 20,
+                                paddingVertical: 15,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                margin: 25,
+                                borderRadius: 11,
+                            }}
+                        >
+                            <View>
+                                <Text
+                                    style={{
+                                        fontFamily: fonts.TeachersBold,
+                                        color: colors.light.white,
+                                        fontSize: 15,
+                                        textAlign: 'center',
+                                    }}
+                                >
+                                    Your points
+                                </Text>
+                                <Text
+                                    style={{
+                                        fontFamily: fonts.TeachersMedium,
+                                        color: colors.light.white,
+                                        fontSize: 40,
+                                        textAlign: 'center',
+                                    }}
+                                >
+                                    350
+                                </Text>
+                            </View>
+                            <View
+                                style={{
+                                    padding: 15,
+                                    paddingHorizontal: 20,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    backgroundColor: '#11454C',
+                                    borderColor: '#32AB45',
+                                    borderWidth: 1,
+                                    borderRadius: 15,
+                                }}
+                            >
+                                <Text
+                                    style={{
+                                        fontFamily: fonts.TeachersSemiBold,
+                                        color: '#32AB45',
+                                        fontSize: 15,
+                                        textAlign: 'center',
+                                    }}
+                                >
+                                    Earned
+                                </Text>
+                                <Text
+                                    style={{
+                                        fontFamily: fonts.TeachersSemiBold,
+                                        color: '#32AB45',
+                                        fontSize: 15,
+                                        textAlign: 'center',
+                                    }}
+                                >
+                                    350 pts
+                                </Text>
+                            </View>
+                        </View>
                         <Image
                             source={require('assets/images/qr.png')}
                             style={{
@@ -116,7 +187,7 @@ export default function Home() {
                                 height: 147 * scaleFactor,
                                 resizeMode: 'contain',
                                 alignSelf: 'center',
-                                marginTop: 40 * scaleFactor,
+                                marginTop: 15 * scaleFactor,
                             }}
                         />
                     </View>
@@ -186,84 +257,126 @@ export default function Home() {
                             </Text>
                         </View>
                     </View>
-                    {(data?.length && !loading) ? <View
-                        style={{
-                            marginTop: 20,
-                            marginHorizontal: 20,
-                            overflow: 'hidden'
-                        }}
-                    >
-                        <Text
+                    {data?.length && !loading ? (
+                        <View
                             style={{
-                                fontFamily: fonts.TeachersBold,
-                                fontSize: 16,
-                                color: 'white',
-                                padding: 5,
+                                marginTop: 20,
+                                marginHorizontal: 20,
+                                overflow: 'hidden',
                             }}
                         >
-                            Recent Scans
-                        </Text>
-                        <View
+                            <Text
+                                style={{
+                                    fontFamily: fonts.TeachersBold,
+                                    fontSize: 16,
+                                    color: 'white',
+                                    padding: 5,
+                                }}
+                            >
+                                Recent Scans
+                            </Text>
+                            <View
                                 style={{
                                     borderWidth: 1,
                                     borderColor: 'rgba(218, 218, 218, 1)',
                                     padding: 10,
                                     borderRadius: 11,
                                     marginHorizontal: 0,
-                                    width: '100%'
+                                    width: '100%',
                                 }}
                             >
-                        <FlatList
-                            data={data}
-                            renderItem={({ item }) => 
-                                <View style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    marginVertical: 5
-                                }}>
-                                    <Entypo name="dot-single" size={24} color={colors.light.secondaryColor} style={{
-                                        alignSelf: 'flex-start',
-                                        marginRight: 7
-                                    }} />
-                                    <View>
-                                        <Text style={{
-                                            fontFamily: fonts.TeachersRegular,
-                                            fontSize: 14,
-                                            color: 'white',
-                                        }}>{item.productName || 'N/A'}</Text>
-                                        <View style={{
-                                            flexDirection: 'row',
-                                            alignItems: 'center'
-                                        }}>
-                                            <Text style={{
-                                                fontFamily: fonts.TeachersRegular,
-                                                fontSize: 14,
-                                                color: 'white',
-                                            }} numberOfLines={1}>{item.isGenuine ? 'Genuine' : 'FAKE'}</Text>
-                                            <Entypo name="dot-single" size={15} color={colors.light.white} />
-                                            <Text style={{
-                                                fontFamily: fonts.TeachersRegular,
-                                                fontSize: 14,
-                                                color: 'white',
-                                            }} numberOfLines={1}>{new Date(item.verifiedAt).toLocaleString('en-US', {
-                                                month: 'short',
-                                                day: 'numeric',
-                                                year: 'numeric',
-                                                // hour: '2-digit',
-                                                // minute: '2-digit',
-                                            })}</Text>
-                                            <Entypo name="dot-single" size={15} color={colors.light.white} />
-                                            <Text style={{
-                                                fontFamily: fonts.TeachersRegular,
-                                                fontSize: 14,
-                                                color: 'white',
-                                            }} numberOfLines={1}>Saddar, Karachi</Text>
+                                <FlatList
+                                    data={data}
+                                    renderItem={({ item }) => (
+                                        <View
+                                            style={{
+                                                flexDirection: 'row',
+                                                alignItems: 'center',
+                                                marginVertical: 5,
+                                            }}
+                                        >
+                                            <Entypo
+                                                name="dot-single"
+                                                size={24}
+                                                color={colors.light.secondaryColor}
+                                                style={{
+                                                    alignSelf: 'flex-start',
+                                                    marginRight: 7,
+                                                }}
+                                            />
+                                            <View>
+                                                <Text
+                                                    style={{
+                                                        fontFamily: fonts.TeachersRegular,
+                                                        fontSize: 14,
+                                                        color: 'white',
+                                                    }}
+                                                >
+                                                    {item.productName || 'N/A'}
+                                                </Text>
+                                                <View
+                                                    style={{
+                                                        flexDirection: 'row',
+                                                        alignItems: 'center',
+                                                    }}
+                                                >
+                                                    <Text
+                                                        style={{
+                                                            fontFamily: fonts.TeachersRegular,
+                                                            fontSize: 14,
+                                                            color: 'white',
+                                                        }}
+                                                        numberOfLines={1}
+                                                    >
+                                                        {item.isGenuine ? 'Genuine' : 'FAKE'}
+                                                    </Text>
+                                                    <Entypo
+                                                        name="dot-single"
+                                                        size={15}
+                                                        color={colors.light.white}
+                                                    />
+                                                    <Text
+                                                        style={{
+                                                            fontFamily: fonts.TeachersRegular,
+                                                            fontSize: 14,
+                                                            color: 'white',
+                                                        }}
+                                                        numberOfLines={1}
+                                                    >
+                                                        {new Date(item.verifiedAt).toLocaleString(
+                                                            'en-US',
+                                                            {
+                                                                month: 'short',
+                                                                day: 'numeric',
+                                                                year: 'numeric',
+                                                                // hour: '2-digit',
+                                                                // minute: '2-digit',
+                                                            },
+                                                        )}
+                                                    </Text>
+                                                    <Entypo
+                                                        name="dot-single"
+                                                        size={15}
+                                                        color={colors.light.white}
+                                                    />
+                                                    <Text
+                                                        style={{
+                                                            fontFamily: fonts.TeachersRegular,
+                                                            fontSize: 14,
+                                                            color: 'white',
+                                                        }}
+                                                        numberOfLines={1}
+                                                    >
+                                                        Saddar, Karachi
+                                                    </Text>
+                                                </View>
+                                            </View>
                                         </View>
-                                    </View>
-                                </View>}
-                        />
+                                    )}
+                                />
+                            </View>
                         </View>
-                    </View> : null}
+                    ) : null}
                 </ScrollView>
             </View>
         </ImageBackground>

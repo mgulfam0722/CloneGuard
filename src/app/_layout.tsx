@@ -18,7 +18,10 @@ export default function RootLayout() {
 
     if (isLoading) {
         return (
-            <ImageBackground source={require('assets/images/initial-background-image.png')} style={layout.fillCenter}>
+            <ImageBackground
+                source={require('assets/images/initial-background-image.png')}
+                style={layout.fillCenter}
+            >
                 <ActivityIndicator size={'large'} color={'white'} />
             </ImageBackground>
         );
@@ -54,7 +57,7 @@ export default function RootLayout() {
                     duration={3000}
                     style={{
                         borderRadius: 12,
-                        marginTop: StatusBar.currentHeight ? StatusBar.currentHeight + 3 : 8,
+                        marginTop: StatusBar.currentHeight ? StatusBar.currentHeight + 3 : 80,
                         marginHorizontal: 12,
                         overflow: 'hidden',
                     }}
