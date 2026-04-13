@@ -47,7 +47,7 @@ export function useListScans(status: ScanItemState = ScanItemState.All, limit = 
     useEffect(() => {
         async function fetchBookings() {
             try {
-                const url = `api/v1/client/Product/scan-history?page=${state.page}&pageSize=${limit}&status=${state.status}`;
+                const url = `api/v1/client/Product/scan-history?pageNumber=${state.page}&pageSize=${limit}&status=${state.status}`;
 
                 const result = await sendRequest({
                     url,

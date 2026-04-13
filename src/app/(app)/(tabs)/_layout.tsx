@@ -1,6 +1,7 @@
 import colors from '@/constants/colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from '@expo/vector-icons/Octicons';
 import { Tabs } from 'expo-router';
 import { StyleSheet } from 'react-native';
@@ -34,6 +35,15 @@ export default function TabLayout() {
                     title: 'History',
                     tabBarIcon: ({ color }) => (
                         <Ionicons size={28} name="time-outline" color={color} />
+                    ),
+                }}
+            />
+            <Tabs.Screen
+                name="reward"
+                options={{
+                    title: 'Profile',
+                    tabBarIcon: ({ color }) => (
+                        <MaterialCommunityIcons name="gift-open-outline" size={28} color={color} />
                     ),
                 }}
             />

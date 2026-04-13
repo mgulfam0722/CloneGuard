@@ -40,15 +40,11 @@ export function useAxiosRequest<Result, Payload = unknown>() {
                     Payload
                 >(config);
 
-                !response.data.status
-                    ? showMessage({
-                          type: 'danger',
-                          message: response.data.message || 'An error occurred',
-                      })
-                    : showMessage({
-                          type: 'success',
-                          message: response.data.message || 'Request successful',
-                      });
+                !response.data.status &&
+                    showMessage({
+                        type: 'danger',
+                        message: response.data.message || 'An error occurred',
+                    });
 
                 setMessage(response.data.message ?? '');
                 setData(response.data.result);

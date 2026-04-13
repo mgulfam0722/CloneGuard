@@ -4,6 +4,7 @@ import { layout } from '@/styles/common';
 import { fonts } from '@/styles/typography';
 import { ScanItemState } from '@/types';
 import Feather from '@expo/vector-icons/Feather';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
     Dimensions,
@@ -28,8 +29,8 @@ export default function History() {
         dispatch,
         loading: scansLoading,
         state: { page, scans, refreshTrigger, status },
-        // fetchBookings
     } = useListScans();
+    const router = useRouter();
     return (
         <ImageBackground
             source={require('assets/images/initial-background-image.png')}
@@ -162,6 +163,11 @@ export default function History() {
                             marginTop: 10,
                             paddingHorizontal: 10,
                         }}
+                        onEndReached={() => {
+                            scans?.length &&
+                                scans.length >= 10 &&
+                                dispatch({ type: 'PAGE', payload: page + 1 });
+                        }}
                         refreshControl={
                             <RefreshControl
                                 refreshing={scansLoading}
@@ -185,7 +191,26 @@ export default function History() {
                             )
                         }
                         renderItem={({ item }) => (
-                            <View
+                            <TouchableOpacity
+                                onPress={() => {
+                                    const isGenuine = Boolean(item?.isGenuine === true);
+
+                                    const payloadWithLocation = {
+                                        ...(item ?? {}),
+                                        // item?.locationName,
+                                        latitude: item.latitude,
+                                        longitude: item.longitude,
+                                    };
+
+                                    const encodedPayload = encodeURIComponent(
+                                        JSON.stringify(payloadWithLocation),
+                                    );
+
+                                    // Navigate to product detail
+                                    router.navigate(
+                                        `/product-detail?isGenuine=${isGenuine}&productData=${encodedPayload}`,
+                                    );
+                                }}
                                 style={{
                                     marginVertical: 10,
                                     flexDirection: 'row',
@@ -228,20 +253,10 @@ export default function History() {
                                         >
                                             {item.productName || 'N/A'}
                                         </Text>
-                                        {/* <Text
-                                            style={{
-                                                fontFamily: fonts.TeachersRegular,
-                                                fontSize: 14,
-                                                color: colors.light.primaryDark,
-                                            }}
-                                        >
-                                            {item?.location || 'N/A'}
-                                        </Text> */}
                                     </View>
                                 </View>
                                 <View
                                     style={{
-                                        // alignSelf: 'flex-end',
                                         alignContent: 'flex-end',
                                     }}
                                 >
@@ -256,8 +271,6 @@ export default function History() {
                                             month: 'short',
                                             day: 'numeric',
                                             year: 'numeric',
-                                            // hour: '2-digit',
-                                            // minute: '2-digit',
                                         })}
                                     </Text>
                                     <View
@@ -283,7 +296,7 @@ export default function History() {
                                         </Text>
                                     </View>
                                 </View>
-                            </View>
+                            </TouchableOpacity>
                         )}
                     />
                 </View>

@@ -7,8 +7,6 @@ import FlashMessage from 'react-native-flash-message';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const AUTH_PATHS = ['/login', '/create-account', '/otp', '/welcome'];
-
 export default function RootLayout() {
     const { isAuthenticated, isLoading, restoreSession } = useSessionStore();
 
@@ -48,6 +46,18 @@ export default function RootLayout() {
                             }}
                         />
                     </Stack.Protected>
+                    <Stack.Screen
+                        name="scan"
+                        options={{
+                            headerShown: false,
+                        }}
+                    />
+                    <Stack.Screen
+                        name="product-detail"
+                        options={{
+                            headerShown: false,
+                        }}
+                    />
                 </Stack>
                 <FlashMessage
                     position="top"

@@ -63,81 +63,94 @@ export default function ProductDetail() {
                     shadowRadius: 20,
                     borderTopLeftRadius: 50,
                     borderTopRightRadius: 50,
-                    flex: isSmallDevice ? 0.25 : 0.2,
-                    paddingBottom: isGenuineBool ? 20 * scaleFactor : 0,
+                    flex: 0.23,
+                    // paddingBottom: isGenuineBool ? 20 * scaleFactor : 0,
                 }}
             >
                 <View
                     style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
+                        flex: 1,
+                        paddingBottom: 30,
                     }}
                 >
-                    <View>
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                            }}
-                        >
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                        }}
+                    >
+                        <View>
                             <View
                                 style={{
-                                    width: '90%',
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
                                 }}
                             >
-                                <Text
+                                <View
                                     style={{
-                                        fontFamily: fonts.TeachersSemiBold,
-                                        color: colors.light.white,
-                                        fontSize: 41 * fontScale,
-                                        letterSpacing: -2,
+                                        width: '90%',
                                     }}
                                 >
-                                    {headerTitle}
-                                </Text>
-                                <Text
-                                    style={{
-                                        fontFamily: fonts.TeachersRegular,
-                                        color: colors.light.white,
-                                        fontSize: 41 * fontScale,
-                                        letterSpacing: -2,
-                                        lineHeight: 40 * fontScale,
-                                    }}
-                                    numberOfLines={1}
-                                >
-                                    {headerSubtitle}
-                                </Text>
-                            </View>
-                            <View>
-                                {isGenuineBool ? (
-                                    <Feather
-                                        name="check-circle"
-                                        size={30}
-                                        color={colors.light.white}
-                                        onPress={() => {
-                                            router.replace('/home');
+                                    <Text
+                                        style={{
+                                            fontFamily: fonts.TeachersSemiBold,
+                                            color: colors.light.white,
+                                            fontSize: 41 * fontScale,
+                                            letterSpacing: -2,
                                         }}
-                                    />
-                                ) : (
-                                    <View>
-                                        <Entypo
-                                            name="circle-with-cross"
+                                    >
+                                        {headerTitle}
+                                    </Text>
+                                    <Text
+                                        style={{
+                                            fontFamily: fonts.TeachersRegular,
+                                            color: colors.light.white,
+                                            fontSize: 41 * fontScale,
+                                            letterSpacing: -2,
+                                            lineHeight: 40 * fontScale,
+                                        }}
+                                        numberOfLines={1}
+                                    >
+                                        {headerSubtitle}
+                                    </Text>
+                                </View>
+                                <View>
+                                    {isGenuineBool ? (
+                                        <Feather
+                                            name="check-circle"
                                             size={30}
-                                            color="#D36C64"
+                                            color={colors.light.white}
                                             onPress={() => {
                                                 router.replace('/home');
                                             }}
                                         />
-                                    </View>
-                                )}
+                                    ) : (
+                                        <View>
+                                            <Entypo
+                                                name="circle-with-cross"
+                                                size={30}
+                                                color="#D36C64"
+                                                onPress={() => {
+                                                    router.replace('/home');
+                                                }}
+                                            />
+                                        </View>
+                                    )}
+                                </View>
                             </View>
                         </View>
+                    </View>
+                    <View
+                        style={{
+                            justifyContent: 'flex-end',
+                            flex: 1,
+                        }}
+                    >
                         <Text
                             style={{
                                 color: '#F4F3F8',
                                 fontFamily: fonts.TeachersRegular,
-                                marginTop: 10 * scaleFactor,
                                 fontSize: 13 * fontScale,
                             }}
                         >
@@ -153,9 +166,10 @@ export default function ProductDetail() {
                     backgroundColor: contentBackground,
                     borderTopLeftRadius: 30,
                     borderTopRightRadius: 30,
-                    flex: isSmallDevice ? 3.75 : 0.8,
+                    flex: 0.76,
                     marginTop: -20,
-                    marginHorizontal: -10,
+                    // marginHorizontal: -10,
+                    paddingTop: 10,
                 }}
             >
                 <ScrollView
@@ -263,20 +277,11 @@ export default function ProductDetail() {
                                     paddingHorizontal: 30 * scaleFactor,
                                 }}
                             >
-                                <Text
-                                    style={{
-                                        fontFamily: fonts.TeachersBold,
-                                        fontSize: 15 * fontScale,
-                                        color: colors.light.white,
-                                    }}
-                                >
-                                    Recent Scans
-                                </Text>
                                 <View
                                     style={{
                                         marginTop: 10 * scaleFactor,
                                         borderRadius: 11,
-                                        borderColor: colors.light.primaryColor,
+                                        borderColor: colors.light.secondaryColor,
                                         borderWidth: 1,
                                         padding: 20 * scaleFactor,
                                     }}
@@ -306,7 +311,7 @@ export default function ProductDetail() {
                                                     color: colors.light.white,
                                                 }}
                                             >
-                                                PKR-2024-041
+                                                {batchNumber}
                                             </Text>
                                         </View>
                                         <View>
@@ -317,7 +322,7 @@ export default function ProductDetail() {
                                                     color: colors.light.white,
                                                 }}
                                             >
-                                                Batch No.
+                                                Mfg. Date
                                             </Text>
                                             <Text
                                                 style={{
@@ -326,7 +331,16 @@ export default function ProductDetail() {
                                                     color: colors.light.white,
                                                 }}
                                             >
-                                                PKR-2024-041
+                                                {new Date(manufacturingDate).toLocaleString(
+                                                    'en-US',
+                                                    {
+                                                        month: 'short',
+                                                        day: 'numeric',
+                                                        year: 'numeric',
+                                                        // hour: '2-digit',
+                                                        // minute: '2-digit',
+                                                    },
+                                                )}
                                             </Text>
                                         </View>
                                     </View>
@@ -353,7 +367,7 @@ export default function ProductDetail() {
                                                     color: colors.light.white,
                                                 }}
                                             >
-                                                Batch No.
+                                                Expiry
                                             </Text>
                                             <Text
                                                 style={{
@@ -362,7 +376,13 @@ export default function ProductDetail() {
                                                     color: colors.light.white,
                                                 }}
                                             >
-                                                PKR-2024-041
+                                                {new Date(expiryDate).toLocaleString('en-US', {
+                                                    month: 'short',
+                                                    day: 'numeric',
+                                                    year: 'numeric',
+                                                    // hour: '2-digit',
+                                                    // minute: '2-digit',
+                                                })}
                                             </Text>
                                         </View>
                                         <View>
@@ -373,7 +393,7 @@ export default function ProductDetail() {
                                                     color: colors.light.white,
                                                 }}
                                             >
-                                                Batch No.
+                                                Category
                                             </Text>
                                             <Text
                                                 style={{
@@ -382,7 +402,7 @@ export default function ProductDetail() {
                                                     color: colors.light.white,
                                                 }}
                                             >
-                                                PKR-2024-041
+                                                {category}
                                             </Text>
                                         </View>
                                     </View>

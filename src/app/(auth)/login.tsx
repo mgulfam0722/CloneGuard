@@ -234,6 +234,9 @@ export default function LoginScreen() {
                                 borderColor: colors.light.white,
                                 marginTop: 20,
                             }}
+                            onPressCallback={() => {
+                                router.navigate('/scan');
+                            }}
                         />
 
                         <Text

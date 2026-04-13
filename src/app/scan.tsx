@@ -205,10 +205,25 @@ export default function Scan() {
                     <CameraView
                         style={StyleSheet.absoluteFill}
                         barcodeScannerSettings={{
-                            barcodeTypes: ['qr'],
+                            barcodeTypes: [
+                                'qr',
+                                // 'aztec',
+                                // 'ean13',
+                                // 'ean8',
+                                // 'qr',
+                                // 'pdf417',
+                                // 'upc_e',
+                                // 'datamatrix',
+                                // 'code39',
+                                // 'code93',
+                                // 'itf14',
+                                // 'codabar',
+                                // 'code128',
+                                // 'upc_a',
+                            ],
                         }}
                         onBarcodeScanned={barcodeScannedHandler}
-                        enableTorch={true}
+                        // enableTorch={true}
                     />
                 )}
 
@@ -274,10 +289,10 @@ export default function Scan() {
                                     source={require('#/assets/images/camera.png')}
                                     style={{ width: 40, height: 40 }}
                                 />
-                                <Text style={styles.cameraScanText}>Camera scan</Text>
-                                <Text style={styles.hintText}>
-                                    Please scan the front of your ID
-                                </Text>
+                                <Text style={styles.cameraScanText}>Scan Product Code</Text>
+                                {/* <Text style={styles.hintText}>
+                                    Please 
+                                </Text> */}
                             </View>
                             <View
                                 style={{
@@ -294,7 +309,7 @@ export default function Scan() {
                                         color: colors.light.white,
                                     }}
                                 >
-                                    Please ensure your ID is within the frame
+                                    Align QR code or barcode within the frame
                                 </Text>
                             </View>
                         </>
