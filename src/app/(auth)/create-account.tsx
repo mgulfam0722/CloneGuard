@@ -1,4 +1,4 @@
-import { Button, Checkbox, Header, Input, PhoneInput } from '@/components';
+import { Button, Checkbox, Header, Input, PhoneInput, Select } from '@/components';
 import colors from '@/constants/colors';
 import { useAxiosRequest } from '@/hooks/useAxiosRequest';
 import { layout } from '@/styles/common';
@@ -35,8 +35,8 @@ const createAccountSchema = z
             .string()
             .min(1, 'Phone number is required')
             .regex(
-                /^(\+971|0)?[5][0,2,4,5,6,8][0-9]{7}$/,
-                'Please enter a valid UAE phone number (05xxxxxxxx or +9715xxxxxxxx)',
+                /^(?:\+92|92|0)?3\d{9}$/,
+                'Please enter a valid Pakistani phone number (03XXXXXXXXX or +923XXXXXXXXX)',
             ),
 
         email: z
@@ -139,7 +139,7 @@ export default function CreateAccount() {
                     City: data.city,
                 },
             });
-            console.log('create account response: ', response);
+
             if (response.status) {
                 // Navigate to OTP screen for verification
                 // Don't call signIn here - wait for OTP verification
@@ -154,8 +154,8 @@ export default function CreateAccount() {
         }
     };
 
-    const [passwordVisible, setPasswordVisible] = useState(false);
-    const [confirmPasswordVsible, setConfirmPasswordVisible] = useState(false);
+    const [passwordVisible, setPasswordVisible] = useState(true);
+    const [confirmPasswordVsible, setConfirmPasswordVisible] = useState(true);
     const passwordIcon = useMemo(
         () => (
             <TouchableOpacity
@@ -416,15 +416,98 @@ export default function CreateAccount() {
                             control={control}
                             name="city"
                             render={({ field: { onChange, onBlur, value } }) => (
-                                <Input
+                                <Select
                                     title="City"
-                                    placeholderText="Enter your city"
-                                    props={{
-                                        autoCapitalize: 'words',
-                                        value,
-                                        onChangeText: onChange,
-                                        onBlur: onBlur,
-                                    }}
+                                    placeholderText="Select city"
+                                    options={[
+                                        { title: 'Abbottabad' },
+                                        { title: 'Ahmadpur East' },
+                                        { title: 'Arifwala' },
+                                        { title: 'Attock' },
+                                        { title: 'Badin' },
+                                        { title: 'Bahawalnagar' },
+                                        { title: 'Bahawalpur' },
+                                        { title: 'Bannu' },
+                                        { title: 'Bhakkar' },
+                                        { title: 'Bhalwal' },
+                                        { title: 'Bhimber' },
+                                        { title: 'Burewala' },
+                                        { title: 'Chakwal' },
+                                        { title: 'Charsadda' },
+                                        { title: 'Chiniot' },
+                                        { title: 'Chishtian' },
+                                        { title: 'Dadu' },
+                                        { title: 'Daska' },
+                                        { title: 'Dera Ghazi Khan' },
+                                        { title: 'Dera Ismail Khan' },
+                                        { title: 'Faisalabad' },
+                                        { title: 'Ghotki' },
+                                        { title: 'Gojra' },
+                                        { title: 'Gujranwala' },
+                                        { title: 'Gujrat' },
+                                        { title: 'Gwadar' },
+                                        { title: 'Hafizabad' },
+                                        { title: 'Hyderabad' },
+                                        { title: 'Islamabad' },
+                                        { title: 'Jacobabad' },
+                                        { title: 'Jaranwala' },
+                                        { title: 'Jhang' },
+                                        { title: 'Jhelum' },
+                                        { title: 'Kamoke' },
+                                        { title: 'Karachi' },
+                                        { title: 'Kasur' },
+                                        { title: 'Khairpur' },
+                                        { title: 'Khanewal' },
+                                        { title: 'Khanpur' },
+                                        { title: 'Khuzdar' },
+                                        { title: 'Kohat' },
+                                        { title: 'Kot Addu' },
+                                        { title: 'Lahore' },
+                                        { title: 'Larkana' },
+                                        { title: 'Layyah' },
+                                        { title: 'Lodhran' },
+                                        { title: 'Mandi Bahauddin' },
+                                        { title: 'Mansehra' },
+                                        { title: 'Mardan' },
+                                        { title: 'Matiari' },
+                                        { title: 'Mianwali' },
+                                        { title: 'Mirpur (AJK)' },
+                                        { title: 'Mirpur Khas' },
+                                        { title: 'Multan' },
+                                        { title: 'Muzaffargarh' },
+                                        { title: 'Muzaffarabad' },
+                                        { title: 'Nankana Sahib' },
+                                        { title: 'Nawabshah' },
+                                        { title: 'Nowshera' },
+                                        { title: 'Okara' },
+                                        { title: 'Pakpattan' },
+                                        { title: 'Peshawar' },
+                                        { title: 'Quetta' },
+                                        { title: 'Rahim Yar Khan' },
+                                        { title: 'Rawalpindi' },
+                                        { title: 'Sadiqabad' },
+                                        { title: 'Sahiwal' },
+                                        { title: 'Sambrial' },
+                                        { title: 'Sargodha' },
+                                        { title: 'Shahdadkot' },
+                                        { title: 'Sheikhupura' },
+                                        { title: 'Shikarpur' },
+                                        { title: 'Sialkot' },
+                                        { title: 'Sibi' },
+                                        { title: 'Skardu' },
+                                        { title: 'Sukkur' },
+                                        { title: 'Swabi' },
+                                        { title: 'Swat' },
+                                        { title: 'Tando Adam' },
+                                        { title: 'Tando Allahyar' },
+                                        { title: 'Turbat' },
+                                        { title: 'Umerkot' },
+                                        { title: 'Vehari' },
+                                        { title: 'Wah Cantonment' },
+                                        { title: 'Zhob' },
+                                    ]}
+                                    value={value}
+                                    onChange={(option) => onChange(option?.title || '')}
                                 />
                             )}
                         />

@@ -9,10 +9,10 @@ const reducer = (state: ScanReducerState, action: ScanActionPayload): ScanReduce
             return { ...state, page: action.payload };
 
         case 'STATUS':
-            return { ...state, status: action.payload };
+            return { ...state, status: action.payload, page: 1 };
 
         case 'REFRESH':
-            return { ...state, refreshTrigger: !state.refreshTrigger };
+            return { ...state, refreshTrigger: !state.refreshTrigger, scans: [], page: 1 };
 
         case 'SCANS':
             return {
@@ -42,20 +42,27 @@ export function useListScans(status: ScanItemState = ScanItemState.All, limit = 
 
     const { token } = useSessionStore();
 
-    const { sendRequest, loading, data } = useAxiosRequest<ScanItem[]>();
+    const { sendRequest, loading, data } = useAxiosRequest<{
+        data: ScanItem[];
+    }>();
 
     useEffect(() => {
         async function fetchBookings() {
             try {
-                const url = `api/v1/client/Product/scan-history?pageNumber=${state.page}&pageSize=${limit}&status=${state.status}`;
-
-                const result = await sendRequest({
+                let url = '';
+                if (state.status === ScanItemState.Genuine) {
+                    url = `api/v1/client/Product/scan-history?pageNumber=${state.page}&pageSize=${limit}&isGenuine=true`;
+                } else if (state.status === ScanItemState.Fake) {
+                    url = `api/v1/client/Product/scan-history?pageNumber=${state.page}&pageSize=${limit}&isGenuine=false`;
+                } else {
+                    url = `api/v1/client/Product/scan-history?pageNumber=${state.page}&pageSize=${limit}`;
+                }
+                console.log('url: ', url)
+                const { result } = await sendRequest({
                     url,
                     method: 'GET',
                 });
-
-                const items = result?.result ?? [];
-
+                const items = result?.data ?? [];
                 if (items.length > 0) {
                     dispatch({ type: 'SCANS', payload: items });
                 } else if (state.page === 1) {

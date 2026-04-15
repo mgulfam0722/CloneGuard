@@ -138,7 +138,7 @@ export default function OTP() {
                                             OtpCode: otp,
                                         },
                                     });
-                                    console.log('response: ', response);
+
                                     if (response.status) {
                                         if (flow !== 'signup' && response.result.resetToken) {
                                             setResetToken(response.result.resetToken);

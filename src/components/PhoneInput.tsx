@@ -17,7 +17,7 @@ export function PhoneInput({
             </Text> */}
             <View style={styles.inputContainer}>
                 <Image
-                    source={require('#/assets/images/uae-flag.png')}
+                    source={require('#/assets/images/pak-flag.png')}
                     style={styles.flagImage}
                     testID="flag-image"
                 />
@@ -28,7 +28,7 @@ export function PhoneInput({
                         fontSize: 17,
                     }}
                 >
-                    +971
+                    +92
                 </Text>
                 <View style={styles.line} />
                 <View>
@@ -36,7 +36,7 @@ export function PhoneInput({
                         placeholderText="Phone number"
                         props={{
                             keyboardType: 'phone-pad',
-                            maxLength: 10,
+                            maxLength: 11,
                             value,
                             onChangeText,
                             autoCapitalize: 'none',

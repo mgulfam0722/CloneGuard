@@ -56,11 +56,18 @@ export function Input({
     return (
         <View style={containerStyle}>
             {title && <Text style={[styles.titleText, titleStyle]}>{title}</Text>}
-            <View style={inputContainerStyle ?? styles.inputContainer}>
+            <View
+                style={[
+                    inputContainerStyle ?? styles.inputContainer,
+                    props?.editable === false && {
+                        backgroundColor: colors.light.gray150,
+                    },
+                ]}
+            >
                 <TextInput
                     onPress={onPressCallback}
                     placeholder={placeholderText}
-                    style={inputStyle ?? styles.input}
+                    style={[inputStyle ?? styles.input]}
                     autoCorrect={false}
                     autoCapitalize="none"
                     autoComplete="off"

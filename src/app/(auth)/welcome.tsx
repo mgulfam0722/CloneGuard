@@ -17,7 +17,6 @@ import Animated, {
     withTiming,
 } from 'react-native-reanimated';
 
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import colors from 'src/constants/colors';
 import { layout } from 'src/styles/common';
 import { fonts } from 'src/styles/typography';
@@ -86,19 +85,30 @@ export default function Welcome() {
                     style={{
                         position: 'absolute',
                         top: 0,
-                        bottom: 0,
+                        bottom: 50,
                         justifyContent: 'center',
                         alignItems: 'center',
                         width: '100%',
                     }}
                 >
+                    <View>
+                        <Image 
+                            source={require('#/assets/images/splash-icon.png')}
+                            style={{
+                                width: 196,
+                                height: 180,
+                                resizeMode: 'contain',
+                            }}
+                        />
+                    </View>
                     <Text
                         style={{
                             fontFamily: fonts.TeachersBold,
                             letterSpacing: -4,
                             fontSize: fontScale * 68,
                             color: colors.light.white,
-                            padding: 15,
+                            marginBottom: 15,
+                            marginTop: -40
                         }}
                     >
                         Authentify
@@ -108,8 +118,9 @@ export default function Welcome() {
                             style={{
                                 color: colors.light.white,
                                 textAlign: 'center',
-                                fontFamily: fonts.TeachersMedium,
+                                fontFamily: fonts.TeachersRegular,
                                 fontSize: 15,
+                                paddingHorizontal: 50
                             }}
                         >
                             Instantly verify any product is real before you buy or consume it
@@ -119,14 +130,20 @@ export default function Welcome() {
                         style={{
                             flexDirection: 'row',
                             alignItems: 'center',
-                            marginTop: 10,
+                            marginTop: 40
                         }}
                     >
-                        <MaterialCommunityIcons
+                        {/* <MaterialCommunityIcons
                             name="gift-open-outline"
                             size={24}
                             color={colors.light.secondaryColor}
-                        />
+                        /> */}
+                        <Image source={require('#/assets/images/gift.png')} style={{
+                            width: 25,
+                            height: 25,
+                            resizeMode: 'contain',
+                            marginRight: 5,
+                        }} />
                         <Text
                             style={{
                                 marginLeft: 5,
@@ -144,7 +161,7 @@ export default function Welcome() {
                             justifyContent: 'center',
                             alignItems: 'center',
                             backgroundColor: '#11454C',
-                            marginHorizontal: 15,
+                            marginHorizontal: 30,
                             borderWidth: 1,
                             borderColor: '#32AB45',
                             marginTop: 20,
@@ -196,7 +213,7 @@ export default function Welcome() {
 const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
-        marginBottom: 50,
+        marginBottom: 30,
         // borderWidth: 3,
         // borderColor: 'red',
         shadowColor: '#000',

@@ -29,6 +29,7 @@ type TypographyStyles = {
     caption: TextStyle;
     interText: TextStyle;
     error: TextStyle;
+    inputLabel: TextStyle;
 };
 
 export const typography = StyleSheet.create<TypographyStyles>({
@@ -65,5 +66,11 @@ export const typography = StyleSheet.create<TypographyStyles>({
         fontSize: 17,
         fontWeight: '600',
         padding: 15,
+    },
+    inputLabel: {
+        fontFamily: fonts.TeachersMedium,
+        fontSize: 16,
+        marginBottom: 5,
+        color: 'black',
     },
 });

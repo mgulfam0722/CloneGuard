@@ -3,12 +3,14 @@ import colors from '@/constants/colors';
 import { useAxiosRequest } from '@/hooks';
 import { layout } from '@/styles/common';
 import { fonts, typography } from '@/styles/typography';
-import { BarcodeScanningResult, CameraView, useCameraPermissions } from 'expo-camera';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { BarcodeScanningResult, CameraView, PermissionStatus, useCameraPermissions } from 'expo-camera';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
+    Animated,
     Dimensions,
     Image,
     Pressable,
@@ -20,13 +22,39 @@ import Svg, { Mask, Rect } from 'react-native-svg';
 
 const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
 
-// Hide tab bar on this screen
-export const unstable_settings = {
-    tabBarStyle: { display: 'none' },
-};
+// Transparent rectangle in center
+const rectWidth = windowWidth * 0.80;
+const rectHeight = windowHeight * 0.22;
+const rectX = (windowWidth - rectWidth) / 2;
+const rectY = rectHeight;
 
 export default function Scan() {
     const [permission, requestPermission] = useCameraPermissions();
+    const scanAnim = useRef(new Animated.Value(0)).current;
+    useEffect(() => {
+        const loop = Animated.loop(
+            Animated.sequence([
+                Animated.timing(scanAnim, {
+                    toValue: 1,
+                    duration: 1200,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(scanAnim, {
+                    toValue: 0,
+                    duration: 1200,
+                    useNativeDriver: true,
+                }),
+            ])
+        );
+
+        loop.start();
+
+        return () => loop.stop();
+    }, []);
+    const translateY = scanAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [rectY, rectY + rectWidth],
+    });
     const { sendRequest, loading: reqLoading } = useAxiosRequest<
         {
             isGenuine: Boolean;
@@ -45,71 +73,19 @@ export default function Scan() {
             latitude: number | null;
             longitude: number | null;
             locationName: string;
+            formattedAddress?: string;
         }
     >();
-    // const {
-    //     state: { token },
-    // } = useOnboardingForm();
 
-    // Transparent rectangle in center (for ID)
-    const rectWidth = windowWidth;
-    const rectHeight = windowHeight * 0.28;
-    const rectX = (windowWidth - rectWidth) / 2;
-    const rectY = (windowHeight - rectHeight * 1.5) / 2;
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-    // const [scanned, setScanned] = useState(false);
+
     const barcodeScannedHandler = useCallback(
         async (details: BarcodeScanningResult) => {
             setLoading(true);
 
-            let locationName = 'Unknown location';
-            let latitude: number | null = null;
-            let longitude: number | null = null;
-
             try {
-                // Request permission only once; ideally call this on scan screen mount
-                const { status } = await Location.requestForegroundPermissionsAsync();
-
-                if (status === 'granted') {
-                    // Fetch location with a timeout (5s max)
-                    const currentLocation = await Promise.race([
-                        Location.getCurrentPositionAsync({}),
-                        new Promise<null>((_, reject) =>
-                            setTimeout(() => reject('Location timeout'), 5000),
-                        ),
-                    ]);
-
-                    if (currentLocation) {
-                        latitude = currentLocation.coords.latitude;
-                        longitude = currentLocation.coords.longitude;
-
-                        const places = await Location.reverseGeocodeAsync({
-                            latitude,
-                            longitude,
-                        });
-
-                        // if (places.length > 0) {
-                        //     const place = places[0];
-                        //     // Build a readable location name with district/city/region/country
-                        //     locationName = [
-                        //         place.district,
-                        //         place.city,
-                        //         place.region,
-                        //         place.country,
-                        //     ]
-                        //         .filter(Boolean)
-                        //         .join(', ');
-                        // }
-                        locationName = places[0].formattedAddress ?? 'Unknown location';
-                    }
-                }
-            } catch (locError) {
-                console.log('Location error (ignored, scan will continue):', locError);
-            }
-
-            try {
-                // Send scan to your API
+                const { latitude, longitude, locationName } = locationRef.current;
                 const res = await sendRequest({
                     url: 'api/v1/client/Product/scan',
                     method: 'POST',
@@ -118,52 +94,74 @@ export default function Scan() {
                         latitude,
                         longitude,
                         locationName,
+                        formattedAddress: locationName,
                     },
                 });
 
-                const scanResult = res.result as {
-                    isGenuine?: boolean;
-                    status?: string;
-                    message?: string;
-                    productName?: string;
-                    sku?: string;
-                    category?: string;
-                    batchNumber?: number;
-                    manufacturingDate?: string;
-                    expiryDate?: string;
-                    tenantName?: string;
-                    verificationCount?: number;
-                } | null;
-
+                const scanResult = res.result;
+                console.log('result: ', scanResult);
                 const isGenuine = Boolean(
-                    scanResult?.isGenuine === true ||
-                    scanResult?.status === 'Genuine' ||
-                    scanResult?.status === 'genuine' ||
-                    scanResult?.status === 'Valid' ||
-                    scanResult?.status === 'valid',
+                    scanResult?.isGenuine
                 );
 
-                const payloadWithLocation = {
-                    ...(scanResult ?? {}),
-                    locationName,
-                    latitude,
-                    longitude,
-                };
-
-                const encodedPayload = encodeURIComponent(JSON.stringify(payloadWithLocation));
-
-                // Navigate to product detail
                 router.replace(
-                    `/product-detail?isGenuine=${isGenuine}&productData=${encodedPayload}`,
+                    `/product-detail?isGenuine=${isGenuine}&productData=${encodeURIComponent(
+                        JSON.stringify({
+                            ...scanResult,
+                            latitude,
+                            longitude,
+                            locationName,
+                        })
+                    )}`
                 );
-            } catch (apiError) {
-                console.log('Scan API error:', apiError);
+            } catch (err) {
+                console.log('Scan API error:', err);
             } finally {
                 setLoading(false);
             }
         },
-        [sendRequest, router],
+        [sendRequest, router]
     );
+
+    const locationRef = useRef<{
+        latitude: number | null;
+        longitude: number | null;
+        locationName: string;
+    }>({
+        latitude: null,
+        longitude: null,
+        locationName: 'Unknown location',
+    });
+
+    useEffect(() => {
+        const initLocation = async () => {
+            try {
+                const { status } = await Location.requestForegroundPermissionsAsync();
+
+                if (status !== 'granted') return;
+
+                const currentLocation = await Location.getCurrentPositionAsync({});
+
+                const { latitude, longitude } = currentLocation.coords;
+
+                const places = await Location.reverseGeocodeAsync({
+                    latitude,
+                    longitude,
+                });
+                
+                locationRef.current = {
+                    latitude,
+                    longitude,
+                    locationName:
+                        places?.[0]?.district ?? 'Unknown location',
+                };
+            } catch (err) {
+                console.log('Location init failed:', err);
+            }
+        };
+
+        initLocation();
+    }, []);
 
     return (
         <View style={{ flex: 1, backgroundColor: colors.light.primaryDark }}>
@@ -223,11 +221,21 @@ export default function Scan() {
                             ],
                         }}
                         onBarcodeScanned={barcodeScannedHandler}
-                        // enableTorch={true}
+                    // enableTorch={true}
                     />
                 )}
-
-                {/* === Dark overlay with transparent center === */}
+                <Animated.View
+                    style={{
+                        position: 'absolute',
+                        left: rectX,
+                        top: 0,
+                        width: rectWidth,
+                        height: 2,
+                        backgroundColor: 'red',
+                        transform: [{ translateY }],
+                        opacity: 0.9,
+                    }}
+                />
                 <Svg
                     pointerEvents="none"
                     width={windowWidth}
@@ -235,13 +243,19 @@ export default function Scan() {
                     style={StyleSheet.absoluteFill}
                 >
                     <Mask id="mask">
-                        <Rect x="0" y="0" width={windowWidth} height={windowHeight} fill="white" />
+                        <Rect
+                            x="0"
+                            y="0"
+                            width={windowWidth}
+                            height={windowHeight}
+                            fill="white"
+                        />
                         <Rect
                             x={rectX}
                             y={rectY}
                             width={rectWidth}
-                            height={rectHeight}
-                            fill="#001E2C"
+                            height={rectWidth}
+                            fill="black"
                         />
                     </Mask>
                     <Rect
@@ -254,7 +268,6 @@ export default function Scan() {
                     />
                 </Svg>
 
-                {/* === Overlay content === */}
                 <View
                     style={[
                         StyleSheet.absoluteFill,
@@ -266,7 +279,7 @@ export default function Scan() {
                         },
                     ]}
                 >
-                    {!permission?.granted ? (
+                    {(permission?.status) === PermissionStatus.DENIED ? (
                         <Button
                             onPressCallback={requestPermission}
                             title="Grant permission to use camera"
@@ -281,23 +294,21 @@ export default function Scan() {
                                     styles.instructions,
                                     {
                                         position: 'absolute',
-                                        top: rectY - 150,
+                                        top: rectY - 100,
                                     },
                                 ]}
                             >
-                                <Image
+                                {/* <Image
                                     source={require('#/assets/images/camera.png')}
                                     style={{ width: 40, height: 40 }}
-                                />
+                                /> */}
+                                <MaterialCommunityIcons name="qrcode-scan" size={40} color="white" />
                                 <Text style={styles.cameraScanText}>Scan Product Code</Text>
-                                {/* <Text style={styles.hintText}>
-                                    Please 
-                                </Text> */}
                             </View>
                             <View
                                 style={{
                                     position: 'absolute',
-                                    top: rectY + rectHeight,
+                                    top: rectY + rectWidth,
                                     padding: 20,
                                     alignSelf: 'center',
                                 }}

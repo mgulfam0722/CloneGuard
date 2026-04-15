@@ -15,6 +15,7 @@ export type ScanItem = {
     city: string;
     latitude: number;
     longitude: number;
+    formattedAddress: string;
 };
 
 export type ScanReducerState = {

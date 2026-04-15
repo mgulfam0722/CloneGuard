@@ -144,7 +144,7 @@ export default function LoginScreen() {
                                     marginTop: 10,
                                 }}
                             >
-                                Sign in to save history and report counterfeit items
+                                Sign in to save history & report counterfeits
                             </Text>
                         </View>
                         <Controller
@@ -152,7 +152,7 @@ export default function LoginScreen() {
                             name="email"
                             render={({ field }) => (
                                 <Input
-                                    title="Email"
+                                    // title="Email"
                                     placeholderText="Enter your email"
                                     props={{
                                         value: field.value,

@@ -222,6 +222,7 @@ export default function History() {
                                     style={{
                                         flexDirection: 'row',
                                         alignItems: 'center',
+                                        width: '72%'
                                     }}
                                 >
                                     <View
@@ -242,6 +243,7 @@ export default function History() {
                                     <View
                                         style={{
                                             marginLeft: 15,
+                                            flex: 1
                                         }}
                                     >
                                         <Text
@@ -253,6 +255,11 @@ export default function History() {
                                         >
                                             {item.productName || 'N/A'}
                                         </Text>
+                                        <Text style={{
+                                            fontFamily: fonts.TeachersRegular,
+                                            fontSize: 14,
+                                            color: colors.light.primaryColor
+                                        }} numberOfLines={2}>{item.formattedAddress}</Text>
                                     </View>
                                 </View>
                                 <View
