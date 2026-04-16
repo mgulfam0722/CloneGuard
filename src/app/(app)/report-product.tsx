@@ -1,18 +1,97 @@
-import { Button, Input } from '@/components';
+import { Button, Input, PhoneInput } from '@/components';
 import colors from '@/constants/colors';
+import { useAxiosRequest } from '@/hooks';
 import { layout } from '@/styles/common';
-import { fonts } from '@/styles/typography';
+import { fonts, typography } from '@/styles/typography';
 import Entypo from '@expo/vector-icons/Entypo';
-import { useRouter } from 'expo-router';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useCallback } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { Dimensions, ImageBackground, Platform, StyleSheet, Text, View } from 'react-native';
 import { KeyboardAwareScrollView, KeyboardProvider } from 'react-native-keyboard-controller';
+import z from 'zod';
+
+// Zod validation schema
+const reportProductSchema = z.object({
+    productName: z
+        .string()
+        .min(1, 'Product name is required')
+        .min(2, 'Product name must be at least 2 characters')
+        .max(50, 'Product name must be less than 50 characters')
+        .regex(/^[a-zA-Z\s]+$/, 'Product name can only contain letters and spaces'),
+
+    phoneNumber: z
+        .string()
+        .min(1, 'Phone number is required')
+        .regex(
+            /^(?:\+92|92|0)?3\d{9}$/,
+            'Please enter a valid Pakistani phone number (03XXXXXXXXX or +923XXXXXXXXX)',
+        ),
+
+    location: z
+        .string()
+        .min(1, 'Location is required')
+        .min(5, 'Location must be at least 10 characters'),
+
+    whereDidYouBuyIt: z
+        .string()
+        .min(1, 'This field is required')
+        .min(5, 'This field must be at least 10 characters')
+        .max(200, 'This field must be less than 200 characters'),
+
+    notes: z
+        .string()
+        .min(1, 'This field is required')
+        .min(2, 'This field must be at least 2 characters')
+        .max(50, 'This field must be less than 50 characters')
+        .regex(/^[a-zA-Z\s]+$/, 'This field can only contain letters and spaces'),
+});
+
+type ReportProductFormData = z.infer<typeof reportProductSchema>;
 
 export default function ReportProduct() {
     const { width, height } = Dimensions.get('window');
-    const isSmallDevice = height < 600;
     const scaleFactor = width / 375;
     const fontScale = Math.min(scaleFactor, 1.2);
     const router = useRouter();
+    const { verificationLogId, locationName } = useLocalSearchParams<{
+        verificationLogId: string;
+        locationName: string;
+    }>();
+    const {
+        control,
+        handleSubmit,
+        formState: { errors, isValid },
+    } = useForm<ReportProductFormData>({
+        resolver: zodResolver(reportProductSchema),
+        mode: 'onChange',
+        defaultValues: {
+            productName: '',
+            phoneNumber: '',
+            whereDidYouBuyIt: '',
+            location: locationName ?? '',
+            notes: '',
+        },
+    });
+
+    const {
+        sendRequest,
+        loading
+    } = useAxiosRequest();
+    const onSubmit = useCallback(async (data: ReportProductFormData) => {
+        const {} = await sendRequest({
+            url: 'api/v1/client/report/add-report',
+            method: 'POST',
+            data: {
+                producName: data.productName,
+                verificationLogId,
+                additionalNote: data.notes,
+                contact: data.phoneNumber,
+                wheredidyoubuyit: data.whereDidYouBuyIt
+            }
+        })
+    }, [verificationLogId]);
     return (
         <KeyboardProvider>
             <ImageBackground
@@ -71,51 +150,109 @@ export default function ReportProduct() {
                             padding: 15 * scaleFactor,
                         }}
                     >
-                        <Input
-                            placeholderText="Product / Code"
-                            title="Product / Code"
-                            titleStyle={{
-                                color: colors.light.primaryDark,
-                            }}
+                        <Controller
+                            control={control}
+                            name="productName"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <Input
+                                    placeholderText="Product Name"
+                                    title="Product Name"
+                                    titleStyle={{
+                                        color: colors.light.primaryDark,
+                                    }}
+                                    props={{
+                                        onChangeText: onChange,
+                                        value: value,
+                                    }}
+                                />
+                            )}
                         />
-                        <Input
-                            title="Where did you buy it?"
-                            placeholderText="Shop name or market"
-                            titleStyle={{
-                                color: colors.light.primaryDark,
-                            }}
+                        {errors.productName && (
+                            <Text style={styles.errorText}>{errors.productName.message}</Text>
+                        )}
+                        
+                        <Controller
+                            control={control}
+                            name="whereDidYouBuyIt"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <Input
+                                    title="Where did you buy it?"
+                                    placeholderText="Shop name or market"
+                                    titleStyle={{
+                                        color: colors.light.primaryDark,
+                                    }}
+                                    props={{
+                                        onChangeText: onChange,
+                                        value: value,
+                                    }}
+                                />
+                            )}
                         />
-                        <Input
-                            title="Location"
-                            placeholderText="City or area"
-                            titleStyle={{
-                                color: colors.light.primaryDark,
-                            }}
+                        {errors.whereDidYouBuyIt && (
+                            <Text style={styles.errorText}>{errors.whereDidYouBuyIt.message}</Text>
+                        )}
+                        
+                        <Controller
+                            control={control}
+                            name="location"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <Input
+                                    title="Location"
+                                    placeholderText="City or area"
+                                    titleStyle={{
+                                        color: colors.light.primaryDark,
+                                    }}
+                                    props={{
+                                        onChangeText: onChange,
+                                        value: value,
+                                    }}
+                                />
+                            )}
                         />
-                        <Input
-                            title="Additional notes"
-                            placeholderText="Enter any additional information"
-                            titleStyle={{
-                                color: colors.light.primaryDark,
-                            }}
-                            props={{
-                                multiline: true,
-                                numberOfLines: 3,
-                            }}
+                        {errors.location && (
+                            <Text style={styles.errorText}>{errors.location.message}</Text>
+                        )}
+                        
+                        <Controller
+                            control={control}
+                            name="notes"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <Input
+                                    title="Additional notes"
+                                    placeholderText="Anything else you'd like to tell?"
+                                    titleStyle={{
+                                        color: colors.light.primaryDark,
+                                    }}
+                                    props={{
+                                        onChangeText: onChange,
+                                        value: value,
+                                        multiline: true
+                                    }}
+                                />
+                            )}
                         />
-                        <Input
-                            title="Your contact information"
-                            placeholderText="03xx-xxxxxxx"
-                            titleStyle={{
-                                color: colors.light.primaryDark,
-                            }}
+                        {errors.notes && (
+                            <Text style={styles.errorText}>{errors.notes.message}</Text>
+                        )}
+                        
+                        <Text style={[styles.titleText]}>Phone Number</Text>
+                        <Controller
+                            control={control}
+                            name="phoneNumber"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <PhoneInput value={value} onChangeText={onChange} />
+                            )}
                         />
+                        {errors.phoneNumber && (
+                            <Text style={styles.errorText}>{errors.phoneNumber.message}</Text>
+                        )}
                         <Button
                             title="Submit report"
                             style={{
                                 marginTop: 20 * scaleFactor,
                                 backgroundColor: '#7F241E',
                             }}
+                            onPressCallback={handleSubmit(onSubmit)}
                         />
                     </View>
                 </KeyboardAwareScrollView>
@@ -133,5 +270,20 @@ const styles = StyleSheet.create({
         backgroundColor: colors.light.secondaryColor,
         paddingVertical: 5,
         marginVertical: 2,
+    },
+    titleText: {
+        ...typography.body,
+        color: colors.light.primaryDark,
+        paddingLeft: 16,
+        marginVertical: 10,
+        fontWeight: '400',
+    },
+    errorText: {
+        color: '#FF6B6B',
+        fontSize: 12,
+        fontFamily: fonts.TeachersRegular,
+        marginTop: 5,
+        marginLeft: 16,
+        marginBottom: 10,
     },
 });

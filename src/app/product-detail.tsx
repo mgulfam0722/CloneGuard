@@ -47,7 +47,10 @@ export default function ProductDetail() {
     const sku = parsedProductData.sku ?? '';
     const { isAuthenticated } = useSessionStore();
     const viewShotRef = useRef<ViewShot>(null);
-
+    const verificationLogId =
+        parsedProductData.verificationLogId ?? (undefined as string | undefined);
+    const locationName = parsedProductData.locationName ?? ('' as string);
+    console.log('verificationLogId: ', verificationLogId, locationName);
     const onShare = async () => {
         try {
             if (!viewShotRef.current?.capture) return;
@@ -593,8 +596,10 @@ export default function ProductDetail() {
 
                                         if (!isAuthenticated) {
                                             router.navigate('/login');
-                                        } else {
-                                            router.navigate('/report-product');
+                                        } else if (verificationLogId) {
+                                            router.navigate(
+                                                `/report-product?verificationLogId=${verificationLogId}&locationName=${locationName}`,
+                                            );
                                         }
                                     }}
                                     title="Report this product"

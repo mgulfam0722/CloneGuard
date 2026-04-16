@@ -92,7 +92,7 @@ export default function Welcome() {
                     }}
                 >
                     <View>
-                        <Image 
+                        <Image
                             source={require('#/assets/images/splash-icon.png')}
                             style={{
                                 width: 196,
@@ -108,7 +108,7 @@ export default function Welcome() {
                             fontSize: fontScale * 68,
                             color: colors.light.white,
                             marginBottom: 15,
-                            marginTop: -40
+                            marginTop: -40,
                         }}
                     >
                         Authentify
@@ -120,7 +120,7 @@ export default function Welcome() {
                                 textAlign: 'center',
                                 fontFamily: fonts.TeachersRegular,
                                 fontSize: 15,
-                                paddingHorizontal: 50
+                                paddingHorizontal: 50,
                             }}
                         >
                             Instantly verify any product is real before you buy or consume it
@@ -130,7 +130,7 @@ export default function Welcome() {
                         style={{
                             flexDirection: 'row',
                             alignItems: 'center',
-                            marginTop: 40
+                            marginTop: 40,
                         }}
                     >
                         {/* <MaterialCommunityIcons
@@ -138,12 +138,15 @@ export default function Welcome() {
                             size={24}
                             color={colors.light.secondaryColor}
                         /> */}
-                        <Image source={require('#/assets/images/gift.png')} style={{
-                            width: 25,
-                            height: 25,
-                            resizeMode: 'contain',
-                            marginRight: 5,
-                        }} />
+                        <Image
+                            source={require('#/assets/images/gift.png')}
+                            style={{
+                                width: 25,
+                                height: 25,
+                                resizeMode: 'contain',
+                                marginRight: 5,
+                            }}
+                        />
                         <Text
                             style={{
                                 marginLeft: 5,

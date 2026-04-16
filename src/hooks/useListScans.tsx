@@ -57,7 +57,7 @@ export function useListScans(status: ScanItemState = ScanItemState.All, limit = 
                 } else {
                     url = `api/v1/client/Product/scan-history?pageNumber=${state.page}&pageSize=${limit}`;
                 }
-                console.log('url: ', url)
+                console.log('url: ', url);
                 const { result } = await sendRequest({
                     url,
                     method: 'GET',

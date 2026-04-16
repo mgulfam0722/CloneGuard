@@ -2,9 +2,14 @@ import { Button } from '@/components';
 import colors from '@/constants/colors';
 import { useAxiosRequest } from '@/hooks';
 import { layout } from '@/styles/common';
-import { fonts, typography } from '@/styles/typography';
+import { fonts } from '@/styles/typography';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { BarcodeScanningResult, CameraView, PermissionStatus, useCameraPermissions } from 'expo-camera';
+import {
+    BarcodeScanningResult,
+    CameraView,
+    PermissionStatus,
+    useCameraPermissions,
+} from 'expo-camera';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -23,14 +28,32 @@ import Svg, { Mask, Rect } from 'react-native-svg';
 const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
 
 // Transparent rectangle in center
-const rectWidth = windowWidth * 0.80;
+const rectWidth = windowWidth * 0.8;
 const rectHeight = windowHeight * 0.22;
 const rectX = (windowWidth - rectWidth) / 2;
 const rectY = rectHeight;
 
+// const isInsideScanArea = (bounds) => {
+//     if (!bounds) return false;
+
+//     const { origin, size } = bounds;
+
+//     const centerX = origin.x + size.width / 2;
+//     const centerY = origin.y + size.height / 2;
+
+//     // ASSUME camera ≈ screen (ONLY rough heuristic)
+//     return (
+//         centerX >= rectX &&
+//         centerX <= rectX + rectWidth &&
+//         centerY >= rectY &&
+//         centerY <= rectY + rectHeight
+//     );
+// };
+
 export default function Scan() {
     const [permission, requestPermission] = useCameraPermissions();
     const scanAnim = useRef(new Animated.Value(0)).current;
+    const [origin, setOrigin] = useState<BarcodeScanningResult | null>();
     useEffect(() => {
         const loop = Animated.loop(
             Animated.sequence([
@@ -44,7 +67,7 @@ export default function Scan() {
                     duration: 1200,
                     useNativeDriver: true,
                 }),
-            ])
+            ]),
         );
 
         loop.start();
@@ -79,8 +102,18 @@ export default function Scan() {
 
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const lock = useRef(false);
+    const locationRef = useRef<{
+        latitude: number | null;
+        longitude: number | null;
+        locationName: string;
+    }>({
+        latitude: null,
+        longitude: null,
+        locationName: 'Unknown location',
+    });
 
-    const barcodeScannedHandler = useCallback(
+    const submitBarcode = useCallback(
         async (details: BarcodeScanningResult) => {
             setLoading(true);
 
@@ -100,9 +133,7 @@ export default function Scan() {
 
                 const scanResult = res.result;
                 console.log('result: ', scanResult);
-                const isGenuine = Boolean(
-                    scanResult?.isGenuine
-                );
+                const isGenuine = Boolean(scanResult?.isGenuine);
 
                 router.replace(
                     `/product-detail?isGenuine=${isGenuine}&productData=${encodeURIComponent(
@@ -111,8 +142,8 @@ export default function Scan() {
                             latitude,
                             longitude,
                             locationName,
-                        })
-                    )}`
+                        }),
+                    )}`,
                 );
             } catch (err) {
                 console.log('Scan API error:', err);
@@ -120,18 +151,22 @@ export default function Scan() {
                 setLoading(false);
             }
         },
-        [sendRequest, router]
+        [locationRef.current, sendRequest, router],
     );
 
-    const locationRef = useRef<{
-        latitude: number | null;
-        longitude: number | null;
-        locationName: string;
-    }>({
-        latitude: null,
-        longitude: null,
-        locationName: 'Unknown location',
-    });
+    const barcodeScannedHandler = useCallback(
+        async (details: BarcodeScanningResult) => {
+            // console.log('origin coordinates: : ', details.bounds.origin.x, details.bounds.origin.y)
+            // console.log(isInsideScanArea(details.bounds));
+
+            if (lock.current) return;
+
+            lock.current = true;
+
+            submitBarcode(details);
+        },
+        [submitBarcode],
+    );
 
     useEffect(() => {
         const initLocation = async () => {
@@ -148,12 +183,11 @@ export default function Scan() {
                     latitude,
                     longitude,
                 });
-                
+
                 locationRef.current = {
                     latitude,
                     longitude,
-                    locationName:
-                        places?.[0]?.district ?? 'Unknown location',
+                    locationName: places?.[0]?.district ?? 'Unknown location',
                 };
             } catch (err) {
                 console.log('Location init failed:', err);
@@ -201,7 +235,14 @@ export default function Scan() {
                     </View>
                 ) : (
                     <CameraView
-                        style={StyleSheet.absoluteFill}
+                        style={{
+                            position: 'absolute',
+                            top: rectY,
+                            left: rectX,
+                            width: rectWidth,
+                            height: rectWidth,
+                        }}
+                        zoom={0.9}
                         barcodeScannerSettings={{
                             barcodeTypes: [
                                 'qr',
@@ -220,8 +261,12 @@ export default function Scan() {
                                 // 'upc_a',
                             ],
                         }}
-                        onBarcodeScanned={barcodeScannedHandler}
-                    // enableTorch={true}
+                        onBarcodeScanned={(d) => {
+                            setTimeout(() => {
+                                barcodeScannedHandler(d);
+                            }, 3000);
+                        }}
+                        // enableTorch={true}
                     />
                 )}
                 <Animated.View
@@ -236,6 +281,20 @@ export default function Scan() {
                         opacity: 0.9,
                     }}
                 />
+                {/* {origin?.bounds && (
+                    <View
+                        style={{
+                        position: 'absolute',
+                        top: origin.bounds.origin.x,
+                        left: origin.bounds.origin.y,
+                        width: origin.bounds.size.width,
+                        height: origin.bounds.size.height,
+                        borderWidth: 2,
+                        borderColor: 'lime',
+                        zIndex: 10,
+                        }}
+                    />
+                )} */}
                 <Svg
                     pointerEvents="none"
                     width={windowWidth}
@@ -243,13 +302,7 @@ export default function Scan() {
                     style={StyleSheet.absoluteFill}
                 >
                     <Mask id="mask">
-                        <Rect
-                            x="0"
-                            y="0"
-                            width={windowWidth}
-                            height={windowHeight}
-                            fill="white"
-                        />
+                        <Rect x="0" y="0" width={windowWidth} height={windowHeight} fill="white" />
                         <Rect
                             x={rectX}
                             y={rectY}
@@ -279,7 +332,7 @@ export default function Scan() {
                         },
                     ]}
                 >
-                    {(permission?.status) === PermissionStatus.DENIED ? (
+                    {permission?.status === PermissionStatus.DENIED ? (
                         <Button
                             onPressCallback={requestPermission}
                             title="Grant permission to use camera"
@@ -302,7 +355,11 @@ export default function Scan() {
                                     source={require('#/assets/images/camera.png')}
                                     style={{ width: 40, height: 40 }}
                                 /> */}
-                                <MaterialCommunityIcons name="qrcode-scan" size={40} color="white" />
+                                <MaterialCommunityIcons
+                                    name="qrcode-scan"
+                                    size={40}
+                                    color="white"
+                                />
                                 <Text style={styles.cameraScanText}>Scan Product Code</Text>
                             </View>
                             <View
@@ -358,52 +415,6 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: colors.light.secondaryColor,
         marginTop: 10,
-    },
-    hintText: {
-        fontFamily: fonts.TeachersRegular,
-        fontSize: 15,
-        color: 'white',
-        marginTop: 10,
-    },
-    captureButton: {
-        width: 70,
-        height: 70,
-        borderRadius: 35,
-        backgroundColor: colors.light.secondaryColor,
-        // justifyContent: 'flex-end',
-        // alignItems: 'flex-end',
-        // alignSelf: 'center',
-        // position: 'absolute',
-        // bottom: 40
-    },
-    captureInnerCircle: {
-        width: 30,
-        height: 30,
-        borderRadius: 15,
-        backgroundColor: 'black',
-    },
-    roundedCameraWrapper: {
-        width: '99.9%',
-        height: windowHeight * 0.75,
-        borderRadius: 10, // whatever radius you want
-        overflow: 'hidden',
-        alignSelf: 'center', // optional, if needed
-        borderWidth: 2,
-        borderColor: 'green', // optional
-        // marginBottom: 20
-    },
-    guidePromptContainer: {
-        justifyContent: 'space-evenly',
-        paddingVertical: 10,
-        alignItems: 'center',
-        // flex: 1,
-    },
-    bodyText: {
-        ...typography.body,
-    },
-    instructionText: {
-        ...typography.body,
-        color: 'white',
     },
     backPressable: {
         width: 'auto',
