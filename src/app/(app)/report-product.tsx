@@ -8,7 +8,16 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Dimensions, ImageBackground, Platform, StyleSheet, Text, View } from 'react-native';
+import {
+    ActivityIndicator,
+    Dimensions,
+    ImageBackground,
+    Platform,
+    StyleSheet,
+    Text,
+    View,
+} from 'react-native';
+import { showMessage } from 'react-native-flash-message';
 import { KeyboardAwareScrollView, KeyboardProvider } from 'react-native-keyboard-controller';
 import z from 'zod';
 
@@ -44,8 +53,7 @@ const reportProductSchema = z.object({
         .string()
         .min(1, 'This field is required')
         .min(2, 'This field must be at least 2 characters')
-        .max(50, 'This field must be less than 50 characters')
-        .regex(/^[a-zA-Z\s]+$/, 'This field can only contain letters and spaces'),
+        .max(50, 'This field must be less than 50 characters'),
 });
 
 type ReportProductFormData = z.infer<typeof reportProductSchema>;
@@ -75,23 +83,29 @@ export default function ReportProduct() {
         },
     });
 
-    const {
-        sendRequest,
-        loading
-    } = useAxiosRequest();
-    const onSubmit = useCallback(async (data: ReportProductFormData) => {
-        const {} = await sendRequest({
-            url: 'api/v1/client/report/add-report',
-            method: 'POST',
-            data: {
-                producName: data.productName,
-                verificationLogId,
-                additionalNote: data.notes,
-                contact: data.phoneNumber,
-                wheredidyoubuyit: data.whereDidYouBuyIt
-            }
-        })
-    }, [verificationLogId]);
+    const { sendRequest, loading } = useAxiosRequest();
+    const onSubmit = useCallback(
+        async (data: ReportProductFormData) => {
+            const { result } = await sendRequest({
+                url: 'api/v1/client/report/add-report',
+                method: 'POST',
+                data: {
+                    producName: data.productName,
+                    verificationLogId,
+                    additionalNote: data.notes,
+                    contact: data.phoneNumber,
+                    wheredidyoubuyit: data.whereDidYouBuyIt,
+                },
+            });
+            console.log('result: ', result);
+            showMessage({
+                type: 'info',
+                message: 'Report submitted.',
+            });
+            router.replace('/home');
+        },
+        [verificationLogId],
+    );
     return (
         <KeyboardProvider>
             <ImageBackground
@@ -170,7 +184,7 @@ export default function ReportProduct() {
                         {errors.productName && (
                             <Text style={styles.errorText}>{errors.productName.message}</Text>
                         )}
-                        
+
                         <Controller
                             control={control}
                             name="whereDidYouBuyIt"
@@ -191,7 +205,7 @@ export default function ReportProduct() {
                         {errors.whereDidYouBuyIt && (
                             <Text style={styles.errorText}>{errors.whereDidYouBuyIt.message}</Text>
                         )}
-                        
+
                         <Controller
                             control={control}
                             name="location"
@@ -212,7 +226,7 @@ export default function ReportProduct() {
                         {errors.location && (
                             <Text style={styles.errorText}>{errors.location.message}</Text>
                         )}
-                        
+
                         <Controller
                             control={control}
                             name="notes"
@@ -226,7 +240,7 @@ export default function ReportProduct() {
                                     props={{
                                         onChangeText: onChange,
                                         value: value,
-                                        multiline: true
+                                        multiline: true,
                                     }}
                                 />
                             )}
@@ -234,7 +248,7 @@ export default function ReportProduct() {
                         {errors.notes && (
                             <Text style={styles.errorText}>{errors.notes.message}</Text>
                         )}
-                        
+
                         <Text style={[styles.titleText]}>Phone Number</Text>
                         <Controller
                             control={control}
@@ -246,14 +260,22 @@ export default function ReportProduct() {
                         {errors.phoneNumber && (
                             <Text style={styles.errorText}>{errors.phoneNumber.message}</Text>
                         )}
-                        <Button
-                            title="Submit report"
-                            style={{
-                                marginTop: 20 * scaleFactor,
-                                backgroundColor: '#7F241E',
-                            }}
-                            onPressCallback={handleSubmit(onSubmit)}
-                        />
+                        {loading ? (
+                            <ActivityIndicator
+                                style={{
+                                    marginTop: 20 * scaleFactor,
+                                }}
+                            />
+                        ) : (
+                            <Button
+                                title="Submit report"
+                                style={{
+                                    marginTop: 20 * scaleFactor,
+                                    backgroundColor: '#7F241E',
+                                }}
+                                onPressCallback={handleSubmit(onSubmit)}
+                            />
+                        )}
                     </View>
                 </KeyboardAwareScrollView>
             </ImageBackground>
