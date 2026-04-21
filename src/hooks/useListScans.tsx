@@ -47,7 +47,7 @@ export function useListScans(status: ScanItemState = ScanItemState.All, limit = 
     }>();
 
     useEffect(() => {
-        async function fetchBookings() {
+        async function fetchScans() {
             try {
                 let url = '';
                 if (state.status === ScanItemState.Genuine) {
@@ -57,7 +57,7 @@ export function useListScans(status: ScanItemState = ScanItemState.All, limit = 
                 } else {
                     url = `api/v1/client/Product/scan-history?pageNumber=${state.page}&pageSize=${limit}`;
                 }
-                console.log('url: ', url);
+                // console.log('url: ', url);
                 const { result } = await sendRequest({
                     url,
                     method: 'GET',
@@ -69,11 +69,11 @@ export function useListScans(status: ScanItemState = ScanItemState.All, limit = 
                     dispatch({ type: 'SCANS', payload: [] });
                 }
             } catch (err) {
-                console.warn('fetchBookings error', err);
+                console.warn('fetchScans error', err);
             }
         }
 
-        fetchBookings();
+        fetchScans();
     }, [state.status, state.page, state.refreshTrigger, sendRequest]);
 
     return { state, dispatch, loading, data };

@@ -97,7 +97,7 @@ export default function ReportProduct() {
                     wheredidyoubuyit: data.whereDidYouBuyIt,
                 },
             });
-            console.log('result: ', result);
+
             showMessage({
                 type: 'info',
                 message: 'Report submitted.',

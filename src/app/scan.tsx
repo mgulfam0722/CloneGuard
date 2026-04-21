@@ -54,7 +54,13 @@ export default function Scan() {
     const [permission, requestPermission] = useCameraPermissions();
     const scanAnim = useRef(new Animated.Value(0)).current;
     const [origin, setOrigin] = useState<BarcodeScanningResult | null>();
+    const [loading, setLoading] = useState(false);
+    const [locationReady, setLocationReady] = useState(false);
     useEffect(() => {
+        if (loading || !locationReady) {
+            scanAnim.stopAnimation();
+            return;
+        }
         const loop = Animated.loop(
             Animated.sequence([
                 Animated.timing(scanAnim, {
@@ -73,7 +79,7 @@ export default function Scan() {
         loop.start();
 
         return () => loop.stop();
-    }, []);
+    }, [loading, locationReady]);
     const translateY = scanAnim.interpolate({
         inputRange: [0, 1],
         outputRange: [rectY, rectY + rectWidth],
@@ -101,7 +107,6 @@ export default function Scan() {
     >();
 
     const router = useRouter();
-    const [loading, setLoading] = useState(false);
     const lock = useRef(false);
     const locationRef = useRef<{
         latitude: number | null;
@@ -119,6 +124,7 @@ export default function Scan() {
 
             try {
                 const { latitude, longitude, locationName } = locationRef.current;
+                console.log('locationName: ', locationName);
                 const res = await sendRequest({
                     url: 'api/v1/client/Product/scan',
                     method: 'POST',
@@ -132,10 +138,10 @@ export default function Scan() {
                 });
 
                 const scanResult = res.result;
-                console.log('result: ', scanResult);
+
                 const isGenuine = Boolean(scanResult?.isGenuine);
 
-                router.replace(
+                router.navigate(
                     `/product-detail?isGenuine=${isGenuine}&productData=${encodeURIComponent(
                         JSON.stringify({
                             ...scanResult,
@@ -149,6 +155,7 @@ export default function Scan() {
                 console.log('Scan API error:', err);
             } finally {
                 setLoading(false);
+                lock.current = false;
             }
         },
         [locationRef.current, sendRequest, router],
@@ -159,42 +166,89 @@ export default function Scan() {
             // console.log('origin coordinates: : ', details.bounds.origin.x, details.bounds.origin.y)
             // console.log(isInsideScanArea(details.bounds));
 
+            if (!locationReady) return;
+
             if (lock.current) return;
 
             lock.current = true;
 
-            submitBarcode(details);
+            setTimeout(() => {
+                submitBarcode(details);
+            }, 500); // small debounce
         },
-        [submitBarcode],
+        [submitBarcode, locationReady],
     );
 
     useEffect(() => {
+        let isMounted = true;
+
+        const getLocationName = (place: Location.LocationGeocodedAddress) => {
+            console.log('place: ', place);
+            return (
+                place?.name ||
+                place?.district ||
+                place?.subregion ||
+                place?.city ||
+                'Unknown location'
+            );
+        };
+
         const initLocation = async () => {
             try {
                 const { status } = await Location.requestForegroundPermissionsAsync();
 
-                if (status !== 'granted') return;
+                if (status !== 'granted') {
+                    console.log('Location permission not granted');
+                    return;
+                }
 
-                const currentLocation = await Location.getCurrentPositionAsync({});
+                console.log('Get position async...');
+                const currentLocation = await Location.getCurrentPositionAsync({
+                    accuracy: Location.Accuracy.Low,
+                });
+                console.log('currentLocation: ', currentLocation);
+                if (!currentLocation) return;
 
                 const { latitude, longitude } = currentLocation.coords;
 
-                const places = await Location.reverseGeocodeAsync({
-                    latitude,
-                    longitude,
-                });
+                // small delay helps stabilize GPS + geocoder
+                // await new Promise((res) => setTimeout(res, 400));
+
+                let locationName = 'Unknown location';
+
+                try {
+                    console.log('Initiating reverse geocode async...');
+                    const places = await Location.reverseGeocodeAsync({
+                        latitude,
+                        longitude,
+                    });
+
+                    locationName = getLocationName(places?.[0]);
+                } catch (geoErr) {
+                    console.log('Reverse geocode failed:', geoErr);
+                }
+
+                if (!isMounted) return;
 
                 locationRef.current = {
                     latitude,
                     longitude,
-                    locationName: places?.[0]?.district ?? 'Unknown location',
+                    locationName,
                 };
+                console.log('Done reverse geocoding');
+                setLocationReady(true);
             } catch (err) {
                 console.log('Location init failed:', err);
+            } finally {
+                setLocationReady(true);
             }
         };
 
         initLocation();
+
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
     return (
@@ -233,6 +287,30 @@ export default function Scan() {
                     >
                         <ActivityIndicator size={'large'} color={colors.light.white} />
                     </View>
+                ) : !locationReady ? (
+                    <View
+                        style={{
+                            position: 'absolute',
+                            zIndex: 2,
+                            top: 0,
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <Text
+                            style={{
+                                fontFamily: fonts.TeachersBold,
+                                fontSize: 15,
+                                color: 'white',
+                                textAlign: 'center',
+                            }}
+                        >
+                            Loading your location...
+                        </Text>
+                    </View>
                 ) : (
                     <CameraView
                         style={{
@@ -262,25 +340,27 @@ export default function Scan() {
                             ],
                         }}
                         onBarcodeScanned={(d) => {
-                            setTimeout(() => {
-                                barcodeScannedHandler(d);
-                            }, 3000);
+                            // setTimeout(() => {
+                            // }, 3000);
+                            barcodeScannedHandler(d);
                         }}
                         // enableTorch={true}
                     />
                 )}
-                <Animated.View
-                    style={{
-                        position: 'absolute',
-                        left: rectX,
-                        top: 0,
-                        width: rectWidth,
-                        height: 2,
-                        backgroundColor: 'red',
-                        transform: [{ translateY }],
-                        opacity: 0.9,
-                    }}
-                />
+                {!loading && locationReady && (
+                    <Animated.View
+                        style={{
+                            position: 'absolute',
+                            left: rectX,
+                            top: 0,
+                            width: rectWidth,
+                            height: 2,
+                            backgroundColor: 'red',
+                            transform: [{ translateY }],
+                            opacity: 0.9,
+                        }}
+                    />
+                )}
                 {/* {origin?.bounds && (
                     <View
                         style={{
@@ -332,7 +412,7 @@ export default function Scan() {
                         },
                     ]}
                 >
-                    {permission?.status === PermissionStatus.DENIED ? (
+                    {permission?.status !== PermissionStatus.GRANTED ? (
                         <Button
                             onPressCallback={requestPermission}
                             title="Grant permission to use camera"

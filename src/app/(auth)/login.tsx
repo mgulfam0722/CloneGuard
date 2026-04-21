@@ -6,6 +6,7 @@ import { layout } from '@/styles/common';
 import { fonts, typography } from '@/styles/typography';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { zodResolver } from '@hookform/resolvers/zod';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -102,7 +103,8 @@ export default function LoginScreen() {
                 },
             });
             if (response.status && response.result?.accessToken) {
-                await signIn(response.result.accessToken, response.result.fullName || '');
+                await signIn(response.result.accessToken, response.result.fullName);
+                await AsyncStorage.setItem('fullName', response.result.fullName);
                 router.replace('/home');
             }
         } catch (e) {

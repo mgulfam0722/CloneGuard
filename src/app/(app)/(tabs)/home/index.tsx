@@ -13,11 +13,14 @@ import { Dimensions, Image, ImageBackground, ScrollView, Text, View } from 'reac
 export default function Home() {
     const router = useRouter();
     const { width, height } = Dimensions.get('window');
-    const isSmallDevice = height < 700;
     const scaleFactor = width / 375; // Base width for scaling
     const fontScale = Math.min(scaleFactor, 1.2); // Cap maximum scaling
     const fullName = useSessionStore((store) => store.fullName);
-    const { loading, data } = useListScans(undefined, 3);
+    const {
+        loading,
+        state: { scans },
+    } = useListScans(undefined, 3);
+
     return (
         <ImageBackground
             source={require('assets/images/initial-background-image.png')}
@@ -299,7 +302,7 @@ export default function Home() {
                             </Text>
                         </View>
                     </View>
-                    {data?.length && !loading ? (
+                    {scans?.length && !loading ? (
                         <View
                             style={{
                                 marginTop: 20,
@@ -327,7 +330,7 @@ export default function Home() {
                                     width: '100%',
                                 }}
                             >
-                                {data.map((item) => (
+                                {scans.map((item) => (
                                     <View
                                         style={{
                                             flexDirection: 'row',
@@ -345,7 +348,12 @@ export default function Home() {
                                                 marginRight: 7,
                                             }}
                                         />
-                                        <View>
+                                        <View
+                                            style={{
+                                                marginRight: 5,
+                                                width: '90%',
+                                            }}
+                                        >
                                             <Text
                                                 style={{
                                                     fontFamily: fonts.TeachersRegular,
@@ -405,10 +413,11 @@ export default function Home() {
                                                         fontFamily: fonts.TeachersRegular,
                                                         fontSize: 14,
                                                         color: 'white',
+                                                        width: '40%',
                                                     }}
                                                     numberOfLines={1}
                                                 >
-                                                    Saddar, Karachi
+                                                    {item.formattedAddress}
                                                 </Text>
                                             </View>
                                         </View>

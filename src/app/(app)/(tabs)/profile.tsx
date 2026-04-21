@@ -100,6 +100,7 @@ export default function Profile() {
         }
     >();
 
+    const setFullName = useSessionStore((store) => store.setFullName);
     const onSubmit = async (data: CreateAccountFormData) => {
         try {
             await sendRequest({
@@ -111,7 +112,7 @@ export default function Profile() {
                     City: data.city,
                 },
             });
-
+            setFullName(data.fullName);
             refetch();
         } catch (error) {
             console.error('Signup failed:', error);

@@ -16,7 +16,6 @@ export default function OTP() {
     const [otp, setOTP] = useState('');
     const router = useRouter();
     const { email, flow = 'signup' } = useLocalSearchParams<{ email: string; flow?: string }>();
-    console.log('flow: ', flow);
     const { sendRequest, loading } = useAxiosRequest<
         {
             accessToken: string | null;

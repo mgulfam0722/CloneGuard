@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { showMessage } from 'react-native-flash-message';
 import * as Keychain from 'react-native-keychain';
 import { create } from 'zustand';
@@ -13,6 +14,7 @@ type SessionState = {
     signOut: () => Promise<void>;
     setResetToken: (token: string) => void;
     clearResetToken: () => void;
+    setFullName: (fullName: string) => void;
 };
 
 const SESSION_DURATION = 24 * 60 * 60 * 7 * 1000; // 7 days in ms
@@ -37,7 +39,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
                 const { password } = credentials;
                 const parsed = JSON.parse(password);
                 const storedToken = parsed.token;
-                const storedFullName = parsed.fullName || '';
+                const storedFullName = await AsyncStorage.getItem('fullName');
                 const storedTimestamp = new Date(parsed.timestamp);
                 const now = new Date();
                 const elapsed = now.getTime() - storedTimestamp.getTime();
@@ -45,7 +47,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
                 if (elapsed < SESSION_DURATION) {
                     set({
                         token: storedToken,
-                        fullName: storedFullName,
+                        fullName: storedFullName || 'N/A',
                         isAuthenticated: true,
                     });
 
@@ -74,7 +76,6 @@ export const useSessionStore = create<SessionState>((set, get) => ({
         try {
             const payload = JSON.stringify({
                 token,
-                fullName,
                 timestamp: new Date().toISOString(),
             });
 
@@ -132,5 +133,10 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     clearResetToken: () =>
         set({
             resetToken: null,
+        }),
+
+    setFullName: (fullName: string) =>
+        set({
+            fullName,
         }),
 }));

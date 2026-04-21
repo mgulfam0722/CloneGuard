@@ -79,7 +79,7 @@ function logAxiosError(error: AxiosError) {
     }
 
     // Optional: full raw dump
-    console.log('⚙️ FULL ERROR OBJECT:', JSON.stringify(error, null, 2));
+    // console.log('FULL ERROR OBJECT:', JSON.stringify(error, null, 2));
 }
 
 instance.interceptors.request.use(

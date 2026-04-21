@@ -50,7 +50,6 @@ export default function ProductDetail() {
     const verificationLogId =
         parsedProductData.verificationLogId ?? (undefined as string | undefined);
     const locationName = parsedProductData.locationName ?? ('' as string);
-    console.log('verificationLogId: ', verificationLogId, locationName);
     const onShare = async () => {
         try {
             if (!viewShotRef.current?.capture) return;
@@ -330,7 +329,11 @@ export default function ProductDetail() {
                                                 paddingHorizontal: 10 * scaleFactor,
                                             }}
                                         >
-                                            <View>
+                                            <View
+                                                style={{
+                                                    width: '50%',
+                                                }}
+                                            >
                                                 <Text
                                                     style={{
                                                         fontFamily: fonts.SoraRegular,
@@ -345,12 +348,18 @@ export default function ProductDetail() {
                                                         fontFamily: fonts.SoraRegular,
                                                         fontSize: 14 * fontScale,
                                                         color: colors.light.white,
+                                                        // width: '30%'
                                                     }}
                                                 >
                                                     {batchNumber}
                                                 </Text>
                                             </View>
-                                            <View>
+                                            <View
+                                                style={{
+                                                    width: '50%',
+                                                    alignItems: 'flex-end',
+                                                }}
+                                            >
                                                 <Text
                                                     style={{
                                                         fontFamily: fonts.SoraRegular,
@@ -476,7 +485,7 @@ export default function ProductDetail() {
                                                 color: colors.light.white,
                                             }}
                                         >
-                                            Saddar, Karachi - helps track distribution
+                                            {locationName} - helps track distribution
                                         </Text>
                                     </View>
                                 </View>
@@ -586,7 +595,7 @@ export default function ProductDetail() {
                                     </View>
                                 </View>
 
-                                <Button
+                                {verificationLogId && <Button
                                     style={{
                                         backgroundColor: '#7F241E',
                                         marginTop: 30 * scaleFactor,
@@ -603,7 +612,7 @@ export default function ProductDetail() {
                                         }
                                     }}
                                     title="Report this product"
-                                />
+                                />}
 
                                 <Button
                                     style={{

@@ -40,8 +40,9 @@ export function PhoneInput({
                             value,
                             onChangeText,
                             autoCapitalize: 'none',
-                            autoComplete: 'off',
                             autoCorrect: false,
+                            importantForAutofill: 'no',
+                            autoComplete: 'tel-device',
                         }}
                         inputStyle={styles.inputStyle}
                         inputContainerStyle={{}}

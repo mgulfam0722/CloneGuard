@@ -296,6 +296,7 @@ export default function CreateAccount() {
                                         value,
                                         onChangeText: onChange,
                                         onBlur: onBlur,
+                                        importantForAutofill: 'no',
                                     }}
                                 />
                             )}
@@ -336,6 +337,8 @@ export default function CreateAccount() {
                                         value,
                                         onChangeText: onChange,
                                         onBlur: onBlur,
+                                        importantForAutofill: 'no',
+                                        autoComplete: 'username-new',
                                     }}
                                 />
                             )}
@@ -359,6 +362,8 @@ export default function CreateAccount() {
                                         onChangeText: onChange,
                                         onBlur: onBlur,
                                         secureTextEntry: passwordVisible,
+                                        importantForAutofill: 'no',
+                                        autoComplete: 'password-new',
                                     }}
                                     icon={passwordIcon}
                                 />
@@ -383,6 +388,8 @@ export default function CreateAccount() {
                                         onChangeText: onChange,
                                         onBlur: onBlur,
                                         secureTextEntry: confirmPasswordVsible,
+                                        importantForAutofill: 'no',
+                                        autoComplete: 'password-new',
                                     }}
                                     icon={confirmPasswordIcon}
                                 />
