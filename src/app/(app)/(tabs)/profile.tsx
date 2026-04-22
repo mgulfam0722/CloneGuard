@@ -6,6 +6,7 @@ import { layout } from '@/styles/common';
 import { fonts } from '@/styles/typography';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { zodResolver } from '@hookform/resolvers/zod';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
@@ -112,6 +113,7 @@ export default function Profile() {
                     City: data.city,
                 },
             });
+            await AsyncStorage.setItem('fullName', data.fullName);
             setFullName(data.fullName);
             refetch();
         } catch (error) {

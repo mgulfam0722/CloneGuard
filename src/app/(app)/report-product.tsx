@@ -219,6 +219,7 @@ export default function ReportProduct() {
                                     props={{
                                         onChangeText: onChange,
                                         value: value,
+                                        maxLength: 200,
                                     }}
                                 />
                             )}

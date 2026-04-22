@@ -595,24 +595,26 @@ export default function ProductDetail() {
                                     </View>
                                 </View>
 
-                                {verificationLogId && <Button
-                                    style={{
-                                        backgroundColor: '#7F241E',
-                                        marginTop: 30 * scaleFactor,
-                                    }}
-                                    onPressCallback={() => {
-                                        // router.navigate('/report-product');
+                                {verificationLogId && (
+                                    <Button
+                                        style={{
+                                            backgroundColor: '#7F241E',
+                                            marginTop: 30 * scaleFactor,
+                                        }}
+                                        onPressCallback={() => {
+                                            // router.navigate('/report-product');
 
-                                        if (!isAuthenticated) {
-                                            router.navigate('/login');
-                                        } else if (verificationLogId) {
-                                            router.navigate(
-                                                `/report-product?verificationLogId=${verificationLogId}&locationName=${locationName}`,
-                                            );
-                                        }
-                                    }}
-                                    title="Report this product"
-                                />}
+                                            if (!isAuthenticated) {
+                                                router.navigate('/login');
+                                            } else if (verificationLogId) {
+                                                router.navigate(
+                                                    `/report-product?verificationLogId=${verificationLogId}&locationName=${locationName}`,
+                                                );
+                                            }
+                                        }}
+                                        title="Report this product"
+                                    />
+                                )}
 
                                 <Button
                                     style={{

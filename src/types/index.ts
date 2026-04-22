@@ -31,3 +31,23 @@ export type ScanActionPayload =
     | { type: 'REFRESH' }
     | { type: 'SCANS'; payload: ScanItem[] };
 // | { type: 'REMOVE_BOOKING'; payload: string };
+
+export type RewardHistoryItem = {
+    id: string;
+    productName: string;
+    companyName: string;
+    points: string;
+    pointsType: string;
+    transactionType: 'Added' | 'Withdraw';
+};
+
+export type RewardHistoryReducerState = {
+    page: number;
+    list: RewardHistoryItem[] | null;
+    refreshTrigger: boolean;
+};
+
+export type RewardHistoryPayload =
+    | { type: 'PAGE'; payload: number }
+    | { type: 'REFRESH' }
+    | { type: 'LIST'; payload: RewardHistoryItem[] };

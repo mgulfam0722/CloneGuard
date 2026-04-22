@@ -165,7 +165,6 @@ export default function Scan() {
         async (details: BarcodeScanningResult) => {
             // console.log('origin coordinates: : ', details.bounds.origin.x, details.bounds.origin.y)
             // console.log(isInsideScanArea(details.bounds));
-
             if (!locationReady) return;
 
             if (lock.current) return;
