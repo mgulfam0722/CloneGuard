@@ -151,7 +151,7 @@ export default function Scan() {
                     )}`,
                 );
             } catch (err) {
-                console.log('Scan API error:', err);
+                console.warn('Scan API error:', err);
             } finally {
                 setLoading(false);
                 lock.current = false;
@@ -224,7 +224,7 @@ export default function Scan() {
 
                     locationName = getLocationName(places?.[0]);
                 } catch (geoErr) {
-                    console.error('Reverse geocode failed:', geoErr);
+                    console.warn('Reverse geocode failed:', geoErr);
                 }
 
                 if (!isMounted) return;
@@ -237,7 +237,7 @@ export default function Scan() {
                 // console.log('Done reverse geocoding');
                 setLocationReady(true);
             } catch (err) {
-                console.error('Location init failed:', err);
+                console.warn('Location init failed:', err);
             } finally {
                 setLocationReady(true);
             }

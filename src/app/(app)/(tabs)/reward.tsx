@@ -1,5 +1,5 @@
 import colors from '@/constants/colors';
-import { useRewardHistory } from '@/hooks';
+import { StrictAxiosConfig, useAxiosOnMount, useRewardHistory } from '@/hooks';
 import { layout } from '@/styles/common';
 import { fonts } from '@/styles/typography';
 import AntDesign from '@expo/vector-icons/AntDesign';
@@ -7,7 +7,7 @@ import EvilIcons from '@expo/vector-icons/EvilIcons';
 import Feather from '@expo/vector-icons/Feather';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
     Dimensions,
     FlatList,
@@ -31,6 +31,22 @@ export default function Home() {
         loading,
         dispatch,
     } = useRewardHistory();
+    const reqConfig = useCallback((): StrictAxiosConfig<unknown> => {
+        return {
+            method: 'GET',
+            url: 'api/v1/client/Configuration/get-configuration',
+        };
+    }, []);
+    const {
+        data,
+        refetch,
+        loading: rewardConfLoading,
+    } = useAxiosOnMount<{
+        signupPts: number;
+        scanPts: number;
+        fakeScanPts: number;
+        fakeReportPts: number;
+    }>(reqConfig);
     return (
         <ImageBackground
             style={[
@@ -215,6 +231,14 @@ export default function Home() {
                             paddingBottom: 100,
                         }}
                         showsVerticalScrollIndicator={false}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={rewardConfLoading}
+                                onRefresh={() => {
+                                    refetch();
+                                }}
+                            />
+                        }
                     >
                         <View
                             style={{
@@ -249,6 +273,7 @@ export default function Home() {
                                 <View
                                     style={{
                                         marginLeft: 15,
+                                        width: '68%',
                                     }}
                                 >
                                     <Text
@@ -257,7 +282,7 @@ export default function Home() {
                                             fontSize: 15,
                                             color: colors.light.primaryColor,
                                         }}
-                                        numberOfLines={1}
+                                        // numberOfLines={1}
                                     >
                                         Sign-up bonus
                                     </Text>
@@ -299,7 +324,7 @@ export default function Home() {
                                             fontSize: 15,
                                         }}
                                     >
-                                        100 pts
+                                        {data?.signupPts || 0} pts
                                     </Text>
                                 </View>
                             </View>
@@ -338,6 +363,7 @@ export default function Home() {
                                 <View
                                     style={{
                                         marginLeft: 15,
+                                        width: '70%',
                                     }}
                                 >
                                     <Text
@@ -346,7 +372,7 @@ export default function Home() {
                                             fontSize: 15,
                                             color: colors.light.primaryColor,
                                         }}
-                                        numberOfLines={1}
+                                        // numberOfLines={1}
                                     >
                                         Scan a product
                                     </Text>
@@ -388,7 +414,96 @@ export default function Home() {
                                             fontSize: 15,
                                         }}
                                     >
-                                        10 pts
+                                        {data?.scanPts || 0} pts
+                                    </Text>
+                                </View>
+                            </View>
+                        </View>
+
+                        <View
+                            style={{
+                                backgroundColor: colors.light.white,
+                                borderRadius: 14,
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                padding: 15,
+                                marginTop: 15,
+                            }}
+                        >
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                    width: '55%',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                <View
+                                    style={{
+                                        backgroundColor: '#FDEDEC',
+                                        width: 74,
+                                        height: 74,
+                                        borderRadius: 16,
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                    }}
+                                >
+                                    <AntDesign name="warning" size={24} color="#E64646" />
+                                </View>
+                                <View
+                                    style={{
+                                        marginLeft: 15,
+                                        width: '80%',
+                                    }}
+                                >
+                                    <Text
+                                        style={{
+                                            fontFamily: fonts.TeachersBold,
+                                            fontSize: 15,
+                                            color: colors.light.primaryColor,
+                                        }}
+                                    >
+                                        Fake scan
+                                    </Text>
+                                    <Text
+                                        style={{
+                                            fontFamily: fonts.TeachersRegular,
+                                            fontSize: 14,
+                                            color: colors.light.primaryColor,
+                                        }}
+                                        numberOfLines={1}
+                                    >
+                                        First fake scan
+                                    </Text>
+                                </View>
+                            </View>
+                            <View>
+                                <View
+                                    style={{
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        borderRadius: 50,
+                                        backgroundColor: colors.light.secondaryColor,
+                                        paddingVertical: 10,
+                                        paddingHorizontal: 20,
+                                        flexDirection: 'row',
+                                    }}
+                                >
+                                    <View>
+                                        <AntDesign
+                                            name={'plus'}
+                                            size={10}
+                                            color={colors.light.white}
+                                        />
+                                    </View>
+                                    <Text
+                                        style={{
+                                            fontFamily: fonts.TeachersRegular,
+                                            color: colors.light.white,
+                                            fontSize: 15,
+                                        }}
+                                    >
+                                        {data?.fakeScanPts || 0} pts
                                     </Text>
                                 </View>
                             </View>
@@ -477,7 +592,7 @@ export default function Home() {
                                             fontSize: 15,
                                         }}
                                     >
-                                        50 pts
+                                        {data?.fakeReportPts || 0} pts
                                     </Text>
                                 </View>
                             </View>
@@ -516,7 +631,7 @@ export default function Home() {
                                 <View
                                     style={{
                                         marginLeft: 15,
-                                        width: '80%',
+                                        width: '65%',
                                     }}
                                 >
                                     <Text
@@ -641,6 +756,7 @@ export default function Home() {
                                     <View
                                         style={{
                                             marginLeft: 15,
+                                            width: '60%',
                                         }}
                                     >
                                         <Text
@@ -649,7 +765,7 @@ export default function Home() {
                                                 fontSize: 15,
                                                 color: colors.light.primaryColor,
                                             }}
-                                            numberOfLines={1}
+                                            // numberOfLines={1}
                                         >
                                             {item.pointsType}
                                         </Text>
