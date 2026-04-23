@@ -1,11 +1,11 @@
 import colors from '@/constants/colors';
 import { useRewardHistory } from '@/hooks';
-import { useSessionStore } from '@/stores';
 import { layout } from '@/styles/common';
 import { fonts } from '@/styles/typography';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import Feather from '@expo/vector-icons/Feather';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -22,11 +22,9 @@ import {
 
 export default function Home() {
     const router = useRouter();
-    const { width, height } = Dimensions.get('window');
-    const isSmallDevice = height < 600;
+    const { width } = Dimensions.get('window');
     const scaleFactor = width / 375; // Base width for scaling
     const fontScale = Math.min(scaleFactor, 1.2); // Cap maximum scaling
-    const fullName = useSessionStore((store) => store.fullName);
     const [selectedPicker, setSelectedPicker] = useState<'earn' | 'history'>('earn');
     const {
         state: { list, page },
@@ -47,7 +45,7 @@ export default function Home() {
                     backgroundColor: colors.light.secondaryColor,
                     marginHorizontal: 5,
                     paddingHorizontal: 20 * scaleFactor,
-                    paddingTop: 30 * scaleFactor,
+                    paddingTop: 20,
                     elevation: 10,
                     shadowColor: '#000',
                     shadowOffset: { width: 0, height: 10 },
@@ -102,6 +100,52 @@ export default function Home() {
                         </Text>
                     </View>
                 </View>
+                {/* <View
+                    style={{
+                        flex: 1,
+                        paddingBottom: 30,
+                    }}
+                >
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                        }}
+                    >
+                        <View
+                            style={{
+                                // width: '70%',
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    fontFamily: fonts.TeachersSemiBold,
+                                    color: colors.light.white,
+                                    fontSize: 41 * fontScale,
+                                    // lineHeight: 30,
+                                    letterSpacing: -2,
+                                }}
+                            >
+                                Welcome,
+                            </Text>
+                        </View>
+                        <View>
+                            <Text
+                                style={{
+                                    fontFamily: fonts.TeachersRegular,
+                                    color: colors.light.white,
+                                    fontSize: 41 * fontScale,
+                                    // letterSpacing: -2,
+                                    // lineHeight: 35 * fontScale,
+                                }}
+                                numberOfLines={1}
+                            >
+                                350 pts
+                            </Text>
+                        </View>
+                    </View>
+                </View> */}
             </View>
             <View
                 style={{
@@ -172,95 +216,6 @@ export default function Home() {
                         }}
                         showsVerticalScrollIndicator={false}
                     >
-                        <View
-                            style={{
-                                backgroundColor: colors.light.white,
-                                borderRadius: 14,
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                padding: 15,
-                                marginTop: 15,
-                            }}
-                        >
-                            <View
-                                style={{
-                                    flexDirection: 'row',
-                                    width: '55%',
-                                    alignItems: 'center',
-                                }}
-                            >
-                                <View
-                                    style={{
-                                        backgroundColor: '#E6F1FB',
-                                        width: 74,
-                                        height: 74,
-                                        borderRadius: 16,
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                    }}
-                                >
-                                    <Feather name="box" size={24} color="#185FA5" />
-                                </View>
-                                <View
-                                    style={{
-                                        marginLeft: 15,
-                                    }}
-                                >
-                                    <Text
-                                        style={{
-                                            fontFamily: fonts.TeachersBold,
-                                            fontSize: 15,
-                                            color: colors.light.primaryColor,
-                                        }}
-                                        numberOfLines={1}
-                                    >
-                                        Scan a product
-                                    </Text>
-                                    <Text
-                                        style={{
-                                            fontFamily: fonts.TeachersRegular,
-                                            fontSize: 14,
-                                            color: colors.light.primaryColor,
-                                        }}
-                                        numberOfLines={1}
-                                    >
-                                        Per verified scan
-                                    </Text>
-                                </View>
-                            </View>
-                            <View>
-                                <View
-                                    style={{
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        borderRadius: 50,
-                                        backgroundColor: colors.light.secondaryColor,
-                                        paddingVertical: 10,
-                                        paddingHorizontal: 20,
-                                        flexDirection: 'row',
-                                    }}
-                                >
-                                    <View>
-                                        <AntDesign
-                                            name={'plus'}
-                                            size={10}
-                                            color={colors.light.white}
-                                        />
-                                    </View>
-                                    <Text
-                                        style={{
-                                            fontFamily: fonts.TeachersRegular,
-                                            color: colors.light.white,
-                                            fontSize: 15,
-                                        }}
-                                    >
-                                        10 pts
-                                    </Text>
-                                </View>
-                            </View>
-                        </View>
-
                         <View
                             style={{
                                 backgroundColor: colors.light.white,
@@ -370,6 +325,95 @@ export default function Home() {
                             >
                                 <View
                                     style={{
+                                        backgroundColor: '#E6F1FB',
+                                        width: 74,
+                                        height: 74,
+                                        borderRadius: 16,
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                    }}
+                                >
+                                    <Feather name="box" size={24} color="#185FA5" />
+                                </View>
+                                <View
+                                    style={{
+                                        marginLeft: 15,
+                                    }}
+                                >
+                                    <Text
+                                        style={{
+                                            fontFamily: fonts.TeachersBold,
+                                            fontSize: 15,
+                                            color: colors.light.primaryColor,
+                                        }}
+                                        numberOfLines={1}
+                                    >
+                                        Scan a product
+                                    </Text>
+                                    <Text
+                                        style={{
+                                            fontFamily: fonts.TeachersRegular,
+                                            fontSize: 14,
+                                            color: colors.light.primaryColor,
+                                        }}
+                                        numberOfLines={1}
+                                    >
+                                        Per verified scan
+                                    </Text>
+                                </View>
+                            </View>
+                            <View>
+                                <View
+                                    style={{
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        borderRadius: 50,
+                                        backgroundColor: colors.light.secondaryColor,
+                                        paddingVertical: 10,
+                                        paddingHorizontal: 20,
+                                        flexDirection: 'row',
+                                    }}
+                                >
+                                    <View>
+                                        <AntDesign
+                                            name={'plus'}
+                                            size={10}
+                                            color={colors.light.white}
+                                        />
+                                    </View>
+                                    <Text
+                                        style={{
+                                            fontFamily: fonts.TeachersRegular,
+                                            color: colors.light.white,
+                                            fontSize: 15,
+                                        }}
+                                    >
+                                        10 pts
+                                    </Text>
+                                </View>
+                            </View>
+                        </View>
+
+                        <View
+                            style={{
+                                backgroundColor: colors.light.white,
+                                borderRadius: 14,
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                padding: 15,
+                                marginTop: 15,
+                            }}
+                        >
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                    width: '55%',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                <View
+                                    style={{
                                         backgroundColor: '#FDEDEC',
                                         width: 74,
                                         height: 74,
@@ -434,6 +478,95 @@ export default function Home() {
                                         }}
                                     >
                                         50 pts
+                                    </Text>
+                                </View>
+                            </View>
+                        </View>
+
+                        <View
+                            style={{
+                                backgroundColor: colors.light.white,
+                                borderRadius: 14,
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                padding: 15,
+                                marginTop: 15,
+                            }}
+                        >
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                    width: '55%',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                <View
+                                    style={{
+                                        backgroundColor: '#EEEDFD',
+                                        width: 74,
+                                        height: 74,
+                                        borderRadius: 16,
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                    }}
+                                >
+                                    <FontAwesome size={28} name="user-o" color={'#5549B3'} />
+                                </View>
+                                <View
+                                    style={{
+                                        marginLeft: 15,
+                                        width: '80%',
+                                    }}
+                                >
+                                    <Text
+                                        style={{
+                                            fontFamily: fonts.TeachersBold,
+                                            fontSize: 15,
+                                            color: colors.light.primaryColor,
+                                        }}
+                                    >
+                                        Refer a friend
+                                    </Text>
+                                    <Text
+                                        style={{
+                                            fontFamily: fonts.TeachersRegular,
+                                            fontSize: 14,
+                                            color: colors.light.primaryColor,
+                                        }}
+                                        // numberOfLines={1}
+                                    >
+                                        When they scan a product
+                                    </Text>
+                                </View>
+                            </View>
+                            <View>
+                                <View
+                                    style={{
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        borderRadius: 50,
+                                        backgroundColor: colors.light.secondaryColor,
+                                        paddingVertical: 10,
+                                        paddingHorizontal: 20,
+                                        flexDirection: 'row',
+                                    }}
+                                >
+                                    <View>
+                                        <AntDesign
+                                            name={'plus'}
+                                            size={10}
+                                            color={colors.light.white}
+                                        />
+                                    </View>
+                                    <Text
+                                        style={{
+                                            fontFamily: fonts.TeachersRegular,
+                                            color: colors.light.white,
+                                            fontSize: 15,
+                                        }}
+                                    >
+                                        70 pts
                                     </Text>
                                 </View>
                             </View>

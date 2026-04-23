@@ -72,7 +72,6 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     },
 
     signIn: async (token: string, fullName: string) => {
-        set({ isLoading: true });
         try {
             const payload = JSON.stringify({
                 token,
@@ -104,8 +103,10 @@ export const useSessionStore = create<SessionState>((set, get) => ({
             }, SESSION_DURATION);
         } catch (err) {
             console.error('SignIn error:', err);
-        } finally {
-            set({ isLoading: false });
+            showMessage({
+                type: 'danger',
+                message: 'Failed to sign in. Please try again.',
+            });
         }
     },
 

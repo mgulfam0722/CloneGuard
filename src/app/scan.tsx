@@ -121,10 +121,9 @@ export default function Scan() {
     const submitBarcode = useCallback(
         async (details: BarcodeScanningResult) => {
             setLoading(true);
-
+            // console.warn('INVOKED!!');
             try {
                 const { latitude, longitude, locationName } = locationRef.current;
-                console.log('locationName: ', locationName);
                 const res = await sendRequest({
                     url: 'api/v1/client/Product/scan',
                     method: 'POST',
@@ -141,7 +140,7 @@ export default function Scan() {
 
                 const isGenuine = Boolean(scanResult?.isGenuine);
 
-                router.navigate(
+                router.replace(
                     `/product-detail?isGenuine=${isGenuine}&productData=${encodeURIComponent(
                         JSON.stringify({
                             ...scanResult,
@@ -167,6 +166,8 @@ export default function Scan() {
             // console.log(isInsideScanArea(details.bounds));
             if (!locationReady) return;
 
+            if (loading || reqLoading) return;
+
             if (lock.current) return;
 
             lock.current = true;
@@ -175,14 +176,13 @@ export default function Scan() {
                 submitBarcode(details);
             }, 500); // small debounce
         },
-        [submitBarcode, locationReady],
+        [submitBarcode, locationReady, loading, reqLoading],
     );
 
     useEffect(() => {
         let isMounted = true;
 
         const getLocationName = (place: Location.LocationGeocodedAddress) => {
-            console.log('place: ', place);
             return (
                 place?.name ||
                 place?.district ||
@@ -197,15 +197,15 @@ export default function Scan() {
                 const { status } = await Location.requestForegroundPermissionsAsync();
 
                 if (status !== 'granted') {
-                    console.log('Location permission not granted');
+                    // console.log('Location permission not granted');
                     return;
                 }
 
-                console.log('Get position async...');
+                // console.log('Get position async...');
                 const currentLocation = await Location.getCurrentPositionAsync({
                     accuracy: Location.Accuracy.Low,
                 });
-                console.log('currentLocation: ', currentLocation);
+                // console.log('currentLocation: ', currentLocation);
                 if (!currentLocation) return;
 
                 const { latitude, longitude } = currentLocation.coords;
@@ -216,7 +216,7 @@ export default function Scan() {
                 let locationName = 'Unknown location';
 
                 try {
-                    console.log('Initiating reverse geocode async...');
+                    // console.log('Initiating reverse geocode async...');
                     const places = await Location.reverseGeocodeAsync({
                         latitude,
                         longitude,
@@ -224,7 +224,7 @@ export default function Scan() {
 
                     locationName = getLocationName(places?.[0]);
                 } catch (geoErr) {
-                    console.log('Reverse geocode failed:', geoErr);
+                    console.error('Reverse geocode failed:', geoErr);
                 }
 
                 if (!isMounted) return;
@@ -234,10 +234,10 @@ export default function Scan() {
                     longitude,
                     locationName,
                 };
-                console.log('Done reverse geocoding');
+                // console.log('Done reverse geocoding');
                 setLocationReady(true);
             } catch (err) {
-                console.log('Location init failed:', err);
+                console.error('Location init failed:', err);
             } finally {
                 setLocationReady(true);
             }
@@ -286,7 +286,7 @@ export default function Scan() {
                     >
                         <ActivityIndicator size={'large'} color={colors.light.white} />
                     </View>
-                ) : !locationReady ? (
+                ) : !locationReady && permission?.granted ? (
                     <View
                         style={{
                             position: 'absolute',

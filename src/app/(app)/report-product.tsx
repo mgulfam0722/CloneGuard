@@ -63,10 +63,11 @@ export default function ReportProduct() {
     const scaleFactor = width / 375;
     const fontScale = Math.min(scaleFactor, 1.2);
     const router = useRouter();
-    const { verificationLogId, locationName } = useLocalSearchParams<{
+    const { verificationLogId, locationName: parsedLocationName } = useLocalSearchParams<{
         verificationLogId: string;
         locationName: string;
     }>();
+    const locationName = JSON.parse(parsedLocationName);
     const {
         control,
         handleSubmit,
@@ -218,7 +219,7 @@ export default function ReportProduct() {
                                     }}
                                     props={{
                                         onChangeText: onChange,
-                                        value: value,
+                                        value,
                                         maxLength: 200,
                                     }}
                                 />
@@ -240,7 +241,7 @@ export default function ReportProduct() {
                                     }}
                                     props={{
                                         onChangeText: onChange,
-                                        value: value,
+                                        value,
                                         multiline: true,
                                     }}
                                 />

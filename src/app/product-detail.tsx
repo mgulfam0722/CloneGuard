@@ -49,7 +49,7 @@ export default function ProductDetail() {
     const viewShotRef = useRef<ViewShot>(null);
     const verificationLogId =
         parsedProductData.verificationLogId ?? (undefined as string | undefined);
-    const locationName = parsedProductData.locationName ?? ('' as string);
+    const locationName = (parsedProductData.locationName as string | undefined) ?? '';
     const onShare = async () => {
         try {
             if (!viewShotRef.current?.capture) return;
@@ -608,7 +608,7 @@ export default function ProductDetail() {
                                                 router.navigate('/login');
                                             } else if (verificationLogId) {
                                                 router.navigate(
-                                                    `/report-product?verificationLogId=${verificationLogId}&locationName=${locationName}`,
+                                                    `/report-product?verificationLogId=${verificationLogId}&locationName=${encodeURIComponent(JSON.stringify(locationName))}`,
                                                 );
                                             }
                                         }}
