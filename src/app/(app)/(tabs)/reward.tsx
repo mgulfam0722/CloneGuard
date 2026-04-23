@@ -743,7 +743,10 @@ export default function Home() {
                                 >
                                     <View
                                         style={{
-                                            backgroundColor: '#EAF3DE',
+                                            backgroundColor:
+                                                item.pointsType === 'Fake Scan'
+                                                    ? '#FFECEC'
+                                                    : '#EAF3DE',
                                             width: 74,
                                             height: 74,
                                             borderRadius: 16,
@@ -751,7 +754,15 @@ export default function Home() {
                                             alignItems: 'center',
                                         }}
                                     >
-                                        <AntDesign name="check-square" size={24} color="#628B3E" />
+                                        {item.pointsType === 'Fake Scan' ? (
+                                            <AntDesign name="warning" size={24} color="#E64646" />
+                                        ) : (
+                                            <AntDesign
+                                                name="check-square"
+                                                size={24}
+                                                color="#628B3E"
+                                            />
+                                        )}
                                     </View>
                                     <View
                                         style={{
