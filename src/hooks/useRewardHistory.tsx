@@ -43,7 +43,7 @@ export function useRewardHistory(limit = 10) {
         async function fetchRewardHistory() {
             try {
                 const { result } = await sendRequest({
-                    url: 'api/v1/client/Points/points-history',
+                    url: `api/v1/client/Points/points-history?pageNumber=${state.page}&pageSize=${limit}`,
                     method: 'GET',
                 });
                 const items = result?.data ?? [];

@@ -56,6 +56,7 @@ export default function Scan() {
     const [origin, setOrigin] = useState<BarcodeScanningResult | null>();
     const [loading, setLoading] = useState(false);
     const [locationReady, setLocationReady] = useState(false);
+    const [flashLight, setFlashLight] = useState(false);
     useEffect(() => {
         if (loading || !locationReady) {
             scanAnim.stopAnimation();
@@ -343,7 +344,7 @@ export default function Scan() {
                             // }, 3000);
                             barcodeScannedHandler(d);
                         }}
-                        // enableTorch={true}
+                        enableTorch={flashLight}
                     />
                 )}
                 {!loading && locationReady && (
@@ -458,6 +459,12 @@ export default function Scan() {
                                 >
                                     Align QR code or barcode within the frame
                                 </Text>
+
+                                <View style={layout.mt25}>
+                                    <Button title={`Turn flash ${flashLight ? 'off' : 'on'}`} onPressCallback={() => {
+                                        setFlashLight((f) => !f);
+                                    }} />
+                                </View>
                             </View>
                         </>
                     )}

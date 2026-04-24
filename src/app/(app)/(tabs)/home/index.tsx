@@ -269,7 +269,7 @@ export default function Home() {
                     >
                         <View
                             style={{
-                                backgroundColor: 'rgba(230, 70, 70, 0.28)',
+                                backgroundColor: 'rgba(252, 75, 75, 0.28)',
                                 width: 64 * scaleFactor,
                                 height: 64 * scaleFactor,
                                 borderRadius: 18,
