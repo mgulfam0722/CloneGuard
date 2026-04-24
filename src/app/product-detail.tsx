@@ -205,14 +205,7 @@ export default function ProductDetail() {
                         paddingTop: 10,
                     }}
                 >
-                    <ScrollView
-                        contentContainerStyle={
-                            {
-                                // paddingBottom: 100 * scaleFactor,
-                            }
-                        }
-                        showsVerticalScrollIndicator={false}
-                    >
+                    <ScrollView showsVerticalScrollIndicator={false}>
                         {isGenuineBool && (
                             <View
                                 style={{
@@ -256,6 +249,7 @@ export default function ProductDetail() {
                                 alignItems: 'center',
                                 marginTop: 30 * scaleFactor,
                                 paddingHorizontal: 30 * scaleFactor,
+                                overflow: 'hidden',
                             }}
                         >
                             <View
@@ -263,12 +257,12 @@ export default function ProductDetail() {
                                     backgroundColor: isGenuineBool
                                         ? colors.light.secondaryColor
                                         : '#7F241E',
-                                    width: isGenuineBool ? 80 * scaleFactor : 64 * scaleFactor,
-                                    height: isGenuineBool ? 80 * scaleFactor : 64 * scaleFactor,
+                                    width: isGenuineBool ? 80 : 64,
+                                    height: isGenuineBool ? 80 : 64,
                                     borderRadius: 18,
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    marginRight: 14 * scaleFactor,
+                                    marginRight: 14,
                                 }}
                             >
                                 <MaterialCommunityIcons
@@ -278,7 +272,10 @@ export default function ProductDetail() {
                                 />
                             </View>
                             <View
-                                style={isGenuineBool ? { marginLeft: 10 * scaleFactor } : undefined}
+                                style={{
+                                    overflow: 'hidden',
+                                    flex: 1,
+                                }}
                             >
                                 <Text
                                     style={{
@@ -430,12 +427,18 @@ export default function ProductDetail() {
                                                     })}
                                                 </Text>
                                             </View>
-                                            <View>
+                                            <View
+                                                style={{
+                                                    width: '50%',
+                                                }}
+                                            >
                                                 <Text
                                                     style={{
                                                         fontFamily: fonts.SoraRegular,
                                                         fontSize: 14 * fontScale,
                                                         color: colors.light.white,
+                                                        justifyContent: 'flex-end',
+                                                        textAlign: 'right',
                                                     }}
                                                 >
                                                     Category
@@ -445,6 +448,7 @@ export default function ProductDetail() {
                                                         fontFamily: fonts.SoraRegular,
                                                         fontSize: 14 * fontScale,
                                                         color: colors.light.white,
+                                                        textAlign: 'right',
                                                     }}
                                                 >
                                                     {category}

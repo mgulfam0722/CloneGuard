@@ -10,6 +10,7 @@ import {
     PermissionStatus,
     useCameraPermissions,
 } from 'expo-camera';
+import * as Device from 'expo-device';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -248,7 +249,22 @@ export default function Scan() {
 
         return () => {
             isMounted = false;
+            // lock.current = false;
         };
+    }, []);
+
+    useEffect(() => {
+        if (__DEV__ && !Device.isDevice) {
+            if (lock.current) return;
+
+            lock.current = true;
+
+            setTimeout(() => {
+                submitBarcode({
+                    data: 'baf5-4e88-0736f414',
+                } as BarcodeScanningResult);
+            }, 500);
+        }
     }, []);
 
     return (
@@ -461,9 +477,12 @@ export default function Scan() {
                                 </Text>
 
                                 <View style={layout.mt25}>
-                                    <Button title={`Turn flash ${flashLight ? 'off' : 'on'}`} onPressCallback={() => {
-                                        setFlashLight((f) => !f);
-                                    }} />
+                                    <Button
+                                        title={`Turn flash ${flashLight ? 'off' : 'on'}`}
+                                        onPressCallback={() => {
+                                            setFlashLight((f) => !f);
+                                        }}
+                                    />
                                 </View>
                             </View>
                         </>
