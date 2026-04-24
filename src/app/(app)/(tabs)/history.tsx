@@ -197,7 +197,7 @@ export default function History() {
 
                                     const payloadWithLocation = {
                                         ...(item ?? {}),
-                                        // item?.locationName,
+                                        locationName: item?.formattedAddress ?? 'N/A',
                                         latitude: item.latitude,
                                         longitude: item.longitude,
                                     };
