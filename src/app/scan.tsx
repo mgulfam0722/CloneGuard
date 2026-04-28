@@ -261,7 +261,7 @@ export default function Scan() {
 
             setTimeout(() => {
                 submitBarcode({
-                    data: 'baf5-4e88-0736f414',
+                    data: '8f77-76a5-4a688ffa',
                 } as BarcodeScanningResult);
             }, 500);
         }
@@ -324,7 +324,7 @@ export default function Scan() {
                                 textAlign: 'center',
                             }}
                         >
-                            Loading your location...
+                            Loading...
                         </Text>
                     </View>
                 ) : (

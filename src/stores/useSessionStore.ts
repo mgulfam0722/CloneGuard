@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 import * as Keychain from 'react-native-keychain';
 import { create } from 'zustand';
@@ -78,7 +79,11 @@ export const useSessionStore = create<SessionState>((set, get) => ({
                 timestamp: new Date().toISOString(),
             });
 
-            if (Keychain && typeof Keychain.setGenericPassword === 'function') {
+            if (
+                Platform.OS !== 'web' &&
+                Keychain &&
+                typeof Keychain.setGenericPassword === 'function'
+            ) {
                 await Keychain.setGenericPassword('auth', payload, {
                     accessible: Keychain.ACCESSIBLE?.WHEN_UNLOCKED_THIS_DEVICE_ONLY ?? undefined,
                 });

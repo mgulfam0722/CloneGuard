@@ -30,7 +30,7 @@ export function Header({
                         testID="back-button"
                     >
                         <Image
-                            source={require('@/assets/images/back-icon.png')}
+                            source={require('#/assets/images/back-icon.png')}
                             resizeMode="contain"
                             testID="back-img"
                             tintColor={'white'}
@@ -38,8 +38,8 @@ export function Header({
                     </Pressable>
                 )}
                 <View>
-                    <Image
-                        source={require('@/assets/images/logo.png')}
+                    {/* <Image
+                        source={require('#/assets/images/logo.png')}
                         style={[
                             styles.logo,
                             {
@@ -50,7 +50,7 @@ export function Header({
                         testID="logo"
                         resizeMode="contain"
                         width={150}
-                    />
+                    /> */}
                 </View>
                 {icon}
             </View>

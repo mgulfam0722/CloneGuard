@@ -1,12 +1,12 @@
 import colors from '@/constants/colors';
-import { StrictAxiosConfig, useAxiosOnMount, useRewardHistory } from '@/hooks';
+import { StrictAxiosConfig, useAxiosOnMount, useAxiosRequest, useRewardHistory } from '@/hooks';
 import { layout } from '@/styles/common';
 import { fonts } from '@/styles/typography';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import Feather from '@expo/vector-icons/Feather';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import {
     Dimensions,
@@ -47,6 +47,29 @@ export default function Home() {
         fakeScanPts: number;
         fakeReportPts: number;
     }>(reqConfig);
+
+    const [pointBalance, setPointBalance] = useState<number | null>(null);
+
+    const { sendRequest, loading: pointsLoading } = useAxiosRequest<{
+        pointBalance: number;
+    }>();
+
+    useFocusEffect(
+        useCallback(() => {
+            async function fetchPoints() {
+                const response = await sendRequest({
+                    method: 'GET',
+                    url: 'api/v1/client/Points/total-points',
+                });
+                if (response) {
+                    setPointBalance(response.result.pointBalance);
+                }
+            }
+
+            fetchPoints();
+        }, [sendRequest]),
+    );
+
     return (
         <ImageBackground
             style={[
@@ -90,7 +113,7 @@ export default function Home() {
                                 textAlign: 'center',
                             }}
                         >
-                            350
+                            {pointBalance !== null ? pointBalance.toString() : '0'}
                         </Text>
                         <Text
                             style={{
@@ -116,52 +139,6 @@ export default function Home() {
                         </Text>
                     </View>
                 </View>
-                {/* <View
-                    style={{
-                        flex: 1,
-                        paddingBottom: 30,
-                    }}
-                >
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                        }}
-                    >
-                        <View
-                            style={{
-                                // width: '70%',
-                            }}
-                        >
-                            <Text
-                                style={{
-                                    fontFamily: fonts.TeachersSemiBold,
-                                    color: colors.light.white,
-                                    fontSize: 41 * fontScale,
-                                    // lineHeight: 30,
-                                    letterSpacing: -2,
-                                }}
-                            >
-                                Welcome,
-                            </Text>
-                        </View>
-                        <View>
-                            <Text
-                                style={{
-                                    fontFamily: fonts.TeachersRegular,
-                                    color: colors.light.white,
-                                    fontSize: 41 * fontScale,
-                                    // letterSpacing: -2,
-                                    // lineHeight: 35 * fontScale,
-                                }}
-                                numberOfLines={1}
-                            >
-                                350 pts
-                            </Text>
-                        </View>
-                    </View>
-                </View> */}
             </View>
             <View
                 style={{

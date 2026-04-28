@@ -1,14 +1,23 @@
 import { Button } from '@/components';
 import colors from '@/constants/colors';
-import { useListScans } from '@/hooks';
+import { useAxiosRequest, useListScans } from '@/hooks';
 import { useSessionStore } from '@/stores';
 import { layout } from '@/styles/common';
 import { fonts } from '@/styles/typography';
 import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useRouter } from 'expo-router';
-import { Dimensions, Image, ImageBackground, ScrollView, Text, View } from 'react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useState } from 'react';
+import {
+    ActivityIndicator,
+    Dimensions,
+    Image,
+    ImageBackground,
+    ScrollView,
+    Text,
+    View,
+} from 'react-native';
 
 export default function Home() {
     const router = useRouter();
@@ -20,6 +29,27 @@ export default function Home() {
         loading,
         state: { scans },
     } = useListScans(undefined, 3);
+    const [pointBalance, setPointBalance] = useState<number | null>(null);
+
+    const { sendRequest, loading: pointsLoading } = useAxiosRequest<{
+        pointBalance: number;
+    }>();
+
+    useFocusEffect(
+        useCallback(() => {
+            async function fetchPoints() {
+                const response = await sendRequest({
+                    method: 'GET',
+                    url: 'api/v1/client/Points/total-points',
+                });
+                if (response) {
+                    setPointBalance(response.result.pointBalance);
+                }
+            }
+
+            fetchPoints();
+        }, [sendRequest]),
+    );
 
     return (
         <ImageBackground
@@ -45,7 +75,7 @@ export default function Home() {
                 <View
                     style={{
                         flex: 1,
-                        paddingBottom: 30,
+                        paddingBottom: 26 * scaleFactor,
                     }}
                 >
                     <View
@@ -77,7 +107,7 @@ export default function Home() {
                                     color: colors.light.white,
                                     fontSize: 41 * fontScale,
                                     letterSpacing: -2,
-                                    lineHeight: 35 * fontScale,
+                                    lineHeight: 43 * fontScale,
                                 }}
                                 numberOfLines={1}
                             >
@@ -138,74 +168,82 @@ export default function Home() {
                             justifyContent: 'center',
                         }}
                     >
-                        <View
-                            style={{
-                                backgroundColor: colors.light.secondaryColor,
-                                paddingHorizontal: 20,
-                                paddingVertical: 15,
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                margin: 25,
-                                borderRadius: 11,
-                            }}
-                        >
-                            <View>
-                                <Text
-                                    style={{
-                                        fontFamily: fonts.TeachersBold,
-                                        color: colors.light.white,
-                                        fontSize: 15,
-                                        textAlign: 'center',
-                                    }}
-                                >
-                                    Your points
-                                </Text>
-                                <Text
-                                    style={{
-                                        fontFamily: fonts.TeachersMedium,
-                                        color: colors.light.white,
-                                        fontSize: 40,
-                                        textAlign: 'center',
-                                    }}
-                                >
-                                    350
-                                </Text>
-                            </View>
+                        {pointsLoading ? (
+                            <ActivityIndicator
+                                style={{
+                                    marginVertical: 30,
+                                }}
+                            />
+                        ) : (
                             <View
                                 style={{
-                                    padding: 15,
+                                    backgroundColor: colors.light.secondaryColor,
                                     paddingHorizontal: 20,
-                                    justifyContent: 'center',
+                                    paddingVertical: 15,
+                                    flexDirection: 'row',
                                     alignItems: 'center',
-                                    backgroundColor: '#11454C',
-                                    borderColor: '#32AB45',
-                                    borderWidth: 1,
-                                    borderRadius: 15,
+                                    justifyContent: 'space-between',
+                                    margin: 25,
+                                    borderRadius: 11,
                                 }}
                             >
-                                <Text
+                                <View>
+                                    <Text
+                                        style={{
+                                            fontFamily: fonts.TeachersBold,
+                                            color: colors.light.white,
+                                            fontSize: 15,
+                                            textAlign: 'center',
+                                        }}
+                                    >
+                                        Your points
+                                    </Text>
+                                    <Text
+                                        style={{
+                                            fontFamily: fonts.TeachersMedium,
+                                            color: colors.light.white,
+                                            fontSize: 40,
+                                            textAlign: 'center',
+                                        }}
+                                    >
+                                        {pointBalance ?? '0'}
+                                    </Text>
+                                </View>
+                                <View
                                     style={{
-                                        fontFamily: fonts.TeachersSemiBold,
-                                        color: '#32AB45',
-                                        fontSize: 15,
-                                        textAlign: 'center',
+                                        padding: 15,
+                                        paddingHorizontal: 20,
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        backgroundColor: '#11454C',
+                                        borderColor: '#32AB45',
+                                        borderWidth: 1,
+                                        borderRadius: 15,
                                     }}
                                 >
-                                    Earned
-                                </Text>
-                                <Text
-                                    style={{
-                                        fontFamily: fonts.TeachersSemiBold,
-                                        color: '#32AB45',
-                                        fontSize: 15,
-                                        textAlign: 'center',
-                                    }}
-                                >
-                                    350 pts
-                                </Text>
+                                    <Text
+                                        style={{
+                                            fontFamily: fonts.TeachersSemiBold,
+                                            color: '#32AB45',
+                                            fontSize: 15,
+                                            textAlign: 'center',
+                                        }}
+                                    >
+                                        Earned
+                                    </Text>
+                                    <Text
+                                        style={{
+                                            fontFamily: fonts.TeachersSemiBold,
+                                            color: '#32AB45',
+                                            fontSize: 15,
+                                            textAlign: 'center',
+                                        }}
+                                    >
+                                        {pointBalance ?? '0'} pts
+                                    </Text>
+                                </View>
                             </View>
-                        </View>
+                        )}
                         <View
                             style={{
                                 flexDirection: 'row',

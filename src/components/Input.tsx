@@ -59,6 +59,11 @@ export function Input({
             <View
                 style={[
                     inputContainerStyle ?? styles.inputContainer,
+                    {
+                        // maxWidth: 700,
+                        // alignSelf: 'center',
+                        // height: Platform.OS === 'web' ? 52 : undefined,
+                    },
                     props?.editable === false && {
                         backgroundColor: colors.light.gray150,
                     },
@@ -105,6 +110,7 @@ const styles = StyleSheet.create({
         ...typography.body,
         width: '90%',
         color: 'black',
+        outlineStyle: undefined,
     },
     iconContainer: {
         justifyContent: 'center',

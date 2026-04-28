@@ -1,5 +1,6 @@
 import { useSessionStore } from '@/stores';
 import { layout } from '@/styles/common';
+import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { useEffect } from 'react';
 import { ActivityIndicator, ImageBackground, StatusBar } from 'react-native';
@@ -10,11 +11,26 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function RootLayout() {
     const { isAuthenticated, isLoading, restoreSession } = useSessionStore();
 
+    const [loaded] = useFonts({
+        'Sora-Bold': require('#/assets/fonts/Sora-Bold.ttf'),
+        'Sora-SemiBold': require('#/assets/fonts/Sora-SemiBold.ttf'),
+        'Teachers-Bold': require('#/assets/fonts/Teachers-Bold.ttf'),
+        'Teachers-BoldItalic': require('#/assets/fonts/Teachers-BoldItalic.ttf'),
+        'Teachers-ExtraBold': require('#/assets/fonts/Teachers-ExtraBold.ttf'),
+        'Teachers-ExtraBoldItalic': require('#/assets/fonts/Teachers-ExtraBoldItalic.ttf'),
+        'Teachers-Italic': require('#/assets/fonts/Teachers-Italic.ttf'),
+        'Teachers-Medium': require('#/assets/fonts/Teachers-Medium.ttf'),
+        'Teachers-MediumItalic': require('#/assets/fonts/Teachers-MediumItalic.ttf'),
+        'Teachers-Regular': require('#/assets/fonts/Teachers-Regular.ttf'),
+        'Teachers-SemiBold': require('#/assets/fonts/Teachers-SemiBold.ttf'),
+        'Teachers-SemiBoldItalic': require('#/assets/fonts/Teachers-SemiBoldItalic.ttf'),
+    });
+
     useEffect(() => {
         restoreSession();
     }, [restoreSession]);
 
-    if (isLoading) {
+    if (isLoading || !loaded) {
         return (
             <ImageBackground
                 source={require('assets/images/initial-background-image.png')}
