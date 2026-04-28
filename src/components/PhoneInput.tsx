@@ -43,6 +43,7 @@ export function PhoneInput({
                             autoCorrect: false,
                             importantForAutofill: 'no',
                             autoComplete: 'tel-device',
+                            editable: !!onChangeText,
                         }}
                         inputStyle={styles.inputStyle}
                         inputContainerStyle={{}}

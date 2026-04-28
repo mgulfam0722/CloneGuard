@@ -261,7 +261,7 @@ export default function Scan() {
 
             setTimeout(() => {
                 submitBarcode({
-                    data: '8f77-76a5-4a688ffa',
+                    data: '8f77-76a5-d5033693',
                 } as BarcodeScanningResult);
             }, 500);
         }

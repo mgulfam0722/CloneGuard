@@ -3,7 +3,7 @@ import colors from '@/constants/colors';
 import { StrictAxiosConfig, useAxiosOnMount, useAxiosRequest } from '@/hooks';
 import { useSessionStore } from '@/stores';
 import { layout } from '@/styles/common';
-import { fonts } from '@/styles/typography';
+import { fonts, typography } from '@/styles/typography';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { zodResolver } from '@hookform/resolvers/zod';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -212,6 +212,8 @@ export default function Profile() {
                                     editable: false,
                                 }}
                             />
+                            {/* <Text style={styles.titleText}>Phone Number</Text>
+                            <PhoneInput value={data?.phoneNumber ?? ''} /> */}
                             <Input
                                 title="Email"
                                 placeholderText="Email"
@@ -407,5 +409,12 @@ const styles = StyleSheet.create({
         marginTop: 5,
         marginLeft: 16,
         marginBottom: 10,
+    },
+    titleText: {
+        ...typography.body,
+        color: colors.light.primaryDark,
+        paddingLeft: 16,
+        marginVertical: 10,
+        fontWeight: '400',
     },
 });

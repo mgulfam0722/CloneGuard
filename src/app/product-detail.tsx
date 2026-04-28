@@ -14,9 +14,14 @@ import ViewShot from 'react-native-view-shot';
 
 export default function ProductDetail() {
     const router = useRouter();
-    const { isGenuine: isGenuineParam = 'false', productData = '{}' } = useLocalSearchParams<{
+    const {
+        isGenuine: isGenuineParam = 'false',
+        productData = '{}',
+        from = '',
+    } = useLocalSearchParams<{
         isGenuine?: string;
         productData?: string;
+        from?: string;
     }>();
     const isGenuineBool = isGenuineParam === 'true';
     const { width } = Dimensions.get('window');
@@ -153,7 +158,11 @@ export default function ProductDetail() {
                                                 size={30}
                                                 color={colors.light.white}
                                                 onPress={() => {
-                                                    router.replace('/home');
+                                                    if (from === 'history') {
+                                                        router.back();
+                                                    } else {
+                                                        router.replace('/home');
+                                                    }
                                                 }}
                                             />
                                         ) : (
@@ -163,7 +172,11 @@ export default function ProductDetail() {
                                                     size={30}
                                                     color="#D36C64"
                                                     onPress={() => {
-                                                        router.replace('/home');
+                                                        if (from === 'history') {
+                                                            router.back();
+                                                        } else {
+                                                            router.replace('/home');
+                                                        }
                                                     }}
                                                 />
                                             </View>

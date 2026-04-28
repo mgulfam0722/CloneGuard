@@ -208,7 +208,7 @@ export default function History() {
 
                                     // Navigate to product detail
                                     router.navigate(
-                                        `/product-detail?isGenuine=${isGenuine}&productData=${encodedPayload}`,
+                                        `/product-detail?isGenuine=${isGenuine}&productData=${encodedPayload}&from=history`,
                                     );
                                 }}
                                 style={{
