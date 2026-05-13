@@ -1,4 +1,5 @@
 import colors from '@/constants/colors';
+import AntDesign from '@expo/vector-icons/AntDesign';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -45,6 +46,13 @@ export default function TabLayout() {
                     tabBarIcon: ({ color }) => (
                         <MaterialCommunityIcons name="gift-open-outline" size={28} color={color} />
                     ),
+                }}
+            />
+            <Tabs.Screen
+                name="points-redemption"
+                options={{
+                    title: 'Points Redemption',
+                    tabBarIcon: ({ color }) => <AntDesign name="star" size={24} color={color} />,
                 }}
             />
             <Tabs.Screen

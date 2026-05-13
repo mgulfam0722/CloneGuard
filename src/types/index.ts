@@ -51,3 +51,36 @@ export type RewardHistoryPayload =
     | { type: 'PAGE'; payload: number }
     | { type: 'REFRESH' }
     | { type: 'LIST'; payload: RewardHistoryItem[] };
+
+export type Wallet = {
+    id: string;
+    tenantId: string;
+    tenantName: string;
+    pointBalance: number;
+    canRedeem: boolean;
+    pointsPerCoupon: number;
+    couponValue: number;
+    redemptionNote: string;
+    redemptionUrl: string;
+};
+
+export type WalletListReducerState = {
+    page: number;
+    list: Wallet[] | null;
+    refreshTrigger: boolean;
+};
+
+export type WalletListPayload =
+    | { type: 'PAGE'; payload: number }
+    | { type: 'REFRESH' }
+    | { type: 'LIST'; payload: Wallet[] };
+
+export type RedemptionHistoryItem = {
+    id: string;
+    tenantName: string;
+    couponCode: string;
+    pointsUsed: number;
+    couponValue: number;
+    isUsed: boolean;
+    createdAt: string;
+};

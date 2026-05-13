@@ -1,6 +1,7 @@
 import { Button } from '@/components';
 import colors from '@/constants/colors';
 import { useAxiosRequest } from '@/hooks';
+import { useLocationStore } from '@/stores/useLocationStore';
 import { layout } from '@/styles/common';
 import { fonts } from '@/styles/typography';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -110,27 +111,34 @@ export default function Scan() {
 
     const router = useRouter();
     const lock = useRef(false);
-    const locationRef = useRef<{
-        latitude: number | null;
-        longitude: number | null;
-        locationName: string;
-    }>({
-        latitude: null,
-        longitude: null,
-        locationName: 'Unknown location',
-    });
+    const { location, setLocation, isLocationFresh } = useLocationStore();
 
     const submitBarcode = useCallback(
         async (details: BarcodeScanningResult) => {
             setLoading(true);
-            // console.warn('INVOKED!!');
+            console.warn('INVOKED!!');
             try {
-                const { latitude, longitude, locationName } = locationRef.current;
+                const { latitude, longitude, locationName } = location;
+                console.log('details.data: ', details.data);
+
+                // Parse text param from QR code - Assuming its a whatsapp link with product code as text param, e.g. https://wa.me/?text=8f77-76a5-d5033693
+                let codeValue = details.data;
+                try {
+                    const url = new URL(details.data);
+                    const textParam = url.searchParams.get('text');
+                    if (textParam) {
+                        console.log('Extracted text param from URL:', textParam);
+                        codeValue = textParam;
+                    }
+                } catch (err) {
+                    // Not a valid URL, proceed with original data
+                    console.warn('Scanned data is not a valid URL, using raw data as codeValue');
+                }
                 const res = await sendRequest({
                     url: 'api/v1/client/Product/scan',
                     method: 'POST',
                     data: {
-                        codeValue: details.data,
+                        codeValue: codeValue,
                         latitude,
                         longitude,
                         locationName,
@@ -139,7 +147,7 @@ export default function Scan() {
                 });
 
                 const scanResult = res.result;
-
+                console.log('Scan API response:', scanResult);
                 const isGenuine = Boolean(scanResult?.isGenuine);
 
                 router.replace(
@@ -159,7 +167,7 @@ export default function Scan() {
                 lock.current = false;
             }
         },
-        [locationRef.current, sendRequest, router],
+        [location, sendRequest, router],
     );
 
     const barcodeScannedHandler = useCallback(
@@ -194,7 +202,7 @@ export default function Scan() {
             );
         };
 
-        const initLocation = async () => {
+        const fetchAndCacheLocation = async () => {
             try {
                 const { status } = await Location.requestForegroundPermissionsAsync();
 
@@ -231,27 +239,39 @@ export default function Scan() {
 
                 if (!isMounted) return;
 
-                locationRef.current = {
+                setLocation({
                     latitude,
                     longitude,
                     locationName,
-                };
+                    timestamp: Date.now(),
+                });
                 // console.log('Done reverse geocoding');
                 setLocationReady(true);
             } catch (err) {
-                console.warn('Location init failed:', err);
+                console.warn('Location fetch failed:', err);
             } finally {
                 setLocationReady(true);
             }
         };
 
-        initLocation();
+        // Check if we have a fresh cached location
+        if (isLocationFresh(30000)) {
+            // 30 seconds
+            console.warn('Using cached location (fresh within 30s)');
+            setLocationReady(true);
+            // Still fetch in background to update cache
+            fetchAndCacheLocation();
+        } else {
+            console.warn('Cached location expired (older than 30s), fetching fresh');
+            // No fresh cache, fetch immediately
+            fetchAndCacheLocation();
+        }
 
         return () => {
             isMounted = false;
             // lock.current = false;
         };
-    }, []);
+    }, [isLocationFresh, setLocation]);
 
     useEffect(() => {
         if (__DEV__ && !Device.isDevice) {
@@ -261,7 +281,7 @@ export default function Scan() {
 
             setTimeout(() => {
                 submitBarcode({
-                    data: '8f77-76a5-d5033693',
+                    data: '0958-32d5-720f3a0c',
                 } as BarcodeScanningResult);
             }, 500);
         }

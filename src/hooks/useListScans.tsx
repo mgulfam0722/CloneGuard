@@ -1,80 +1,30 @@
-import { useSessionStore } from '@/stores';
-import { ScanActionPayload, ScanItem, ScanItemState, ScanReducerState } from '@/types';
-import { useEffect, useReducer } from 'react';
-import { useAxiosRequest } from './useAxiosRequest';
-
-const reducer = (state: ScanReducerState, action: ScanActionPayload): ScanReducerState => {
-    switch (action.type) {
-        case 'PAGE':
-            return { ...state, page: action.payload };
-
-        case 'STATUS':
-            return { ...state, status: action.payload, page: 1 };
-
-        case 'REFRESH':
-            return { ...state, refreshTrigger: !state.refreshTrigger, scans: [], page: 1 };
-
-        case 'SCANS':
-            return {
-                ...state,
-                scans:
-                    state.page === 1 ? action.payload : [...(state.scans ?? []), ...action.payload],
-            };
-
-        // case 'REMOVE_BOOKING':
-        //     return {
-        //         ...state,
-        //         bookings: state.bookings?.filter((b) => b.id !== action.payload) ?? null,
-        //     };
-
-        default:
-            return state;
-    }
-};
+import { ScanItem, ScanItemState } from '@/types';
+import { useCallback, useState } from 'react';
+import { usePaginatedList } from './usePaginatedList';
 
 export function useListScans(status: ScanItemState = ScanItemState.All, limit = 10) {
-    const [state, dispatch] = useReducer(reducer, {
-        page: 1,
-        status,
-        scans: null,
-        refreshTrigger: false,
-    });
+    const [currentStatus, setCurrentStatus] = useState(status);
 
-    const { token } = useSessionStore();
-
-    const { sendRequest, loading, data } = useAxiosRequest<{
-        data: ScanItem[];
-    }>();
-
-    useEffect(() => {
-        async function fetchScans() {
-            try {
-                let url = '';
-                if (state.status === ScanItemState.Genuine) {
-                    url = `api/v1/client/Product/scan-history?pageNumber=${state.page}&pageSize=${limit}&isGenuine=true`;
-                } else if (state.status === ScanItemState.Fake) {
-                    url = `api/v1/client/Product/scan-history?pageNumber=${state.page}&pageSize=${limit}&isGenuine=false`;
-                } else {
-                    url = `api/v1/client/Product/scan-history?pageNumber=${state.page}&pageSize=${limit}`;
-                }
-                // console.log('url: ', url);
-                const { result } = await sendRequest({
-                    url,
-                    method: 'GET',
-                });
-                const items = result?.data ?? [];
-                if (items.length > 0) {
-                    dispatch({ type: 'SCANS', payload: items });
-                } else if (state.page === 1) {
-                    dispatch({ type: 'SCANS', payload: [] });
-                }
-            } catch (err) {
-                console.warn('fetchScans error', err);
+    const fetchUrl = useCallback(
+        (page: number, pageSize: number) => {
+            let url = `api/v1/client/Product/scan-history?pageNumber=${page}&pageSize=${pageSize}`;
+            if (currentStatus === ScanItemState.Genuine) {
+                url += '&isGenuine=true';
+            } else if (currentStatus === ScanItemState.Fake) {
+                url += '&isGenuine=false';
             }
-        }
+            return url;
+        },
+        [currentStatus],
+    );
 
-        fetchScans();
-    }, [state.status, state.page, state.refreshTrigger, sendRequest]);
+    const { state, dispatch, loading, data } = usePaginatedList<ScanItem>(fetchUrl, { limit });
 
-    return { state, dispatch, loading, data };
+    const handleStatusChange = (newStatus: ScanItemState) => {
+        setCurrentStatus(newStatus);
+        // Reset pagination when status changes
+        dispatch({ type: 'REFRESH' });
+    };
+
+    return { state, dispatch, loading, data, status: currentStatus, setStatus: handleStatusChange };
 }
