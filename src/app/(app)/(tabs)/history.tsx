@@ -28,7 +28,8 @@ export default function History() {
     const {
         dispatch,
         loading: scansLoading,
-        state: { page, scans, refreshTrigger, status },
+        state: { page, list, refreshTrigger },
+        setStatus: handleStatusChange,
     } = useListScans();
     const router = useRouter();
     return (
@@ -81,10 +82,7 @@ export default function History() {
                         }
                         onPress={() => {
                             setSelectedFilter('All');
-                            dispatch({
-                                type: 'STATUS',
-                                payload: ScanItemState.All,
-                            });
+                            handleStatusChange(ScanItemState.All);
                         }}
                     >
                         <Text
@@ -109,10 +107,7 @@ export default function History() {
                         }
                         onPress={() => {
                             setSelectedFilter('Genuine');
-                            dispatch({
-                                type: 'STATUS',
-                                payload: ScanItemState.Genuine,
-                            });
+                            handleStatusChange(ScanItemState.Genuine);
                         }}
                     >
                         <Text
@@ -137,10 +132,7 @@ export default function History() {
                         }
                         onPress={() => {
                             setSelectedFilter('Fake');
-                            dispatch({
-                                type: 'STATUS',
-                                payload: ScanItemState.Fake,
-                            });
+                            handleStatusChange(ScanItemState.Fake);
                         }}
                     >
                         <Text
@@ -156,7 +148,7 @@ export default function History() {
                 </View>
                 <View>
                     <FlatList
-                        data={scans}
+                        data={list}
                         keyExtractor={(item) => item.id}
                         contentContainerStyle={{
                             paddingBottom: 200 * scaleFactor,
@@ -164,8 +156,8 @@ export default function History() {
                             paddingHorizontal: 10,
                         }}
                         onEndReached={() => {
-                            scans?.length &&
-                                scans.length >= 10 &&
+                            list?.length &&
+                                list.length >= 10 &&
                                 dispatch({ type: 'PAGE', payload: page + 1 });
                         }}
                         refreshControl={
